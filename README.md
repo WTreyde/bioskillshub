@@ -64,3 +64,7 @@ ImageJ statistical utilities are runnable; real scientific validation requires L
 See [the acquired-skill walkthrough](docs/using-skills.md). Each acquired version includes direct Markdown/provenance downloads, a copyable task prompt and optional terminal retrieval instructions. **AI settings** supports a personal OpenAI API key for explicit recommendations/draft generation; keys are request-scoped and not saved. API usage is billed separately from simulated skill purchases. Manual ChatGPT/local-agent handoff requires no API key in BioSkillsHub.
 
 Create a skill conversationally in **Creator studio → Chat with AI**: explain the workflow, answer follow-up questions, create a draft, then review/save/publish. See [the walkthrough](docs/using-skills.md#create-a-skill-by-chatting).
+
+## Literature starter catalogue
+
+Four free, cited review checklists cover Imaging, Genomics, Chemistry and Structural biology. Populate an existing database with `npm run db:seed-literature -- --owner wojtek --apply` after reviewing the default dry run. See [sources, limitations and container import instructions](science/literature/README.md). These are literature adaptations awaiting expert review, not validated scientific protocols.
