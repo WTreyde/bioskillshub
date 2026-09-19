@@ -19,7 +19,7 @@ Read README.md, docs/architecture.md and your docs/team/<name>.md before changin
 - Coordinate shared files before concurrent edits. Agents should not launch separate subagents unless the human explicitly requests them.
 
 ## Git and integration
-Use one clone per person and short-lived codex/<person>-<change> branches. Never share an active working tree. Fetch and merge/rebase from the integration branch only with a clean tree. Push coherent tested pieces, open a PR and have a teammate review before integration. Never force-push another person's branch or overwrite uncommitted work.
+Use one clone per person and short-lived codex/<person>-<change> branches. Never share an active working tree. Fetch and merge/rebase from the integration branch only with a clean tree. Push coherent tested pieces and open a PR. Wojtek authorised immediate merging without teammate review; run the required checks before integration. Never force-push another person's branch or overwrite uncommitted work.
 
 ## Security and spending
 Never commit .env, .local/, credentials, invite tokens or private datasets. Published sample skills in science/ are intentionally public examples. Secrets must not appear in prompts, logs, screenshots or task output. Use the helper for agent token transport.
