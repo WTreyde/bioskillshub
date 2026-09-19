@@ -12,7 +12,7 @@ Install Git, Node 22+, Python 3.10+, Docker and Docker Compose using official di
 
 Create Linux accounts `efe`, `leandre`, `maxim`, `wojtek` and `integration`, with home directories and individual SSH public keys. Share private account credentials out of band. Grant only the permissions needed; Docker group membership is effectively root and must be intentional. Prefer the integration owner managing shared infrastructure.
 
-PR #1 has merged into `main`. Each person clones `git clone --branch main https://github.com/WTreyde/bioskillshub.git` into their own home. For each new change, start with a clean personal checkout, run `git fetch origin`, then `git switch -c codex/<name>-<change> origin/main`. Open a PR targeting `main` and obtain teammate review before integration. Use separate Docker Compose project names, database volumes and app ports:
+PR #1 has merged into `main`. Each person clones `git clone --branch main https://github.com/WTreyde/bioskillshub.git` into their own home. For each new change, start with a clean personal checkout, run `git fetch origin`, then `git switch -c codex/<name>-<change> origin/main`. Open a PR targeting `main`; Wojtek has authorised merging without teammate review once the required checks pass. Use separate Docker Compose project names, database volumes and app ports:
 
 | Account | App port | Database port | Compose project |
 |---|---:|---:|---|
@@ -45,5 +45,7 @@ Keep CPU services in Docker with restart policies. Use tmux for a long-lived rem
 - Once personal SSH access is enabled: `cd ~/bioskillshub`, authenticate `codex` yourself, then start `npm run dev -- --port <allocated-port>`. Do not copy another person's Codex authentication.
 - Integration passwords are preserved in `/home/integration/bioskillshub/.local/` as well as the app container. Administrators can retrieve them privately with sudo. These differ from locally generated development passwords.
 - Administrator tunnel: `ssh -N -L 127.0.0.1:3000:127.0.0.1:3000 bioskillshub-cpu`; then open http://localhost:3000. Stop any local development server using port 3000 first.
-- Integration management: `sudo docker compose --project-directory /home/integration/bioskillshub ps` (or `up -d --build` after reviewed updates). Never delete its database volume.
+- Integration management: `sudo docker compose --project-directory /home/integration/bioskillshub ps` (or `up -d --build` after tested, merged updates). Never delete its database volume.
 - The remote real-HTTP agent smoke test passed: acquired-only listing, pinned download, SHA-256 provenance and immediate revocation. Codex is installed but personal authentication and desktop remote attachment remain pending.
+
+For deployment backup commands, browser rehearsal, scientific gates and the freeze handoff, see [Demo rehearsal](rehearsal.md).
