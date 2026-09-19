@@ -1,0 +1,14 @@
+[
+  {
+    "id": "anthropic-protein-binder-design",
+    "title": "Anthropic protein-binder design bundle guide",
+    "summary": "Review Anthropic’s released campaign prompts, source provenance and infrastructure requirements. A bundle guide; execution remains unverified.",
+    "domain": "Structural biology",
+    "price_cents": 0,
+    "validation": "Source-backed bundle guide; execution unverified; not validated by BioSkillsHub",
+    "release_notes": "Initial attributed adaptation of the release README at d442eeb195e50e071f53e91ddb1ce046cf2a4249",
+    "source_url": "https://huggingface.co/datasets/Anthropic/claude-protein-binder-design/blob/d442eeb195e50e071f53e91ddb1ce046cf2a4249/prompts/README.md",
+    "source_revision": "d442eeb195e50e071f53e91ddb1ce046cf2a4249",
+    "source_license": "CC BY 4.0"
+  }
+]
