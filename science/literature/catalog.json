@@ -1,0 +1,78 @@
+[
+  {
+    "id": "bp-image-figure-review",
+    "file": "image-figure-review.md",
+    "title": "Microscopy figure clarity audit",
+    "summary": "Audit figure scale, insets, labels and accessible colours using a cited literature checklist. Expert review pending.",
+    "domain": "Imaging",
+    "price_cents": 0,
+    "validation": "Literature-based checklist; expert review pending; not experimentally validated",
+    "release_notes": "Initial attributed literature adaptation; source checked 2026-09-19",
+    "source": {
+      "authors": "Jambor et al.",
+      "year": "2021",
+      "title": "Creating clear and informative image-based figures for scientific publications",
+      "doi": "10.1371/journal.pbio.3001161",
+      "url": "https://doi.org/10.1371/journal.pbio.3001161",
+      "license": "CC BY",
+      "checked": "2026-09-19"
+    }
+  },
+  {
+    "id": "bp-scrna-qc-review",
+    "file": "scrna-qc-review.md",
+    "title": "Single-cell RNA-seq QC review",
+    "summary": "Review cell quality metrics and preprocessing decisions using a cited tutorial. No universal thresholds or validation claims.",
+    "domain": "Genomics",
+    "price_cents": 0,
+    "validation": "Literature-based checklist; expert review pending; not experimentally validated",
+    "release_notes": "Initial attributed literature adaptation; source checked 2026-09-19",
+    "source": {
+      "authors": "Luecken and Theis",
+      "year": "2019",
+      "title": "Current best practices in single-cell RNA-seq analysis: a tutorial",
+      "doi": "10.15252/msb.20188746",
+      "url": "https://doi.org/10.15252/msb.20188746",
+      "license": "CC BY 4.0",
+      "checked": "2026-09-19"
+    }
+  },
+  {
+    "id": "bp-docking-review",
+    "file": "docking-review.md",
+    "title": "Molecular docking reproducibility review",
+    "summary": "Review receptor preparation, docking controls and interpretation using a cited best-practice paper. Not an affinity predictor.",
+    "domain": "Chemistry",
+    "price_cents": 0,
+    "validation": "Literature-based checklist; expert review pending; not experimentally validated",
+    "release_notes": "Initial attributed literature adaptation; source checked 2026-09-19",
+    "source": {
+      "authors": "Martis and Téletchéa",
+      "year": "2025",
+      "title": "Ten quick tips to perform meaningful and reproducible molecular docking calculations",
+      "doi": "10.1371/journal.pcbi.1013030",
+      "url": "https://doi.org/10.1371/journal.pcbi.1013030",
+      "license": "CC BY",
+      "checked": "2026-09-19"
+    }
+  },
+  {
+    "id": "bp-homology-model-review",
+    "file": "homology-model-review.md",
+    "title": "Comparative protein model review",
+    "summary": "Audit template selection, alignment and regional model quality using a cited comparative-modelling guide. Expert review pending.",
+    "domain": "Structural biology",
+    "price_cents": 0,
+    "validation": "Literature-based checklist; expert review pending; not experimentally validated",
+    "release_notes": "Initial attributed literature adaptation; source checked 2026-09-19",
+    "source": {
+      "authors": "Haddad, Adam and Heger",
+      "year": "2020",
+      "title": "Ten quick tips for homology modeling of high-resolution protein 3D structures",
+      "doi": "10.1371/journal.pcbi.1007449",
+      "url": "https://doi.org/10.1371/journal.pcbi.1007449",
+      "license": "CC BY",
+      "checked": "2026-09-19"
+    }
+  }
+]
