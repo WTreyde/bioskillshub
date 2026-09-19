@@ -19,7 +19,9 @@ async function body(r:Request) {
  const reader=r.body?.getReader();if(!reader)throw new HttpError(400,'Missing JSON.');
  const chunks:Uint8Array[]=[];let size=0;
  while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>MAX_JSON_BYTES){await reader.cancel();throw new HttpError(413,'Encoded request is too large.');}chunks.push(value);}
- try{return JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{throw new HttpError(400,'Invalid JSON.');}
+ let value:unknown;try{value=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(Buffer.concat(chunks)));}catch{throw new HttpError(400,'Invalid UTF-8 JSON.');}
+ if(value===null||typeof value!=='object'||Array.isArray(value))throw new HttpError(400,'Send a JSON object.');
+ return value as Record<string,unknown>;
 }
 const json=(value:unknown,status=200)=>NextResponse.json(value,{status,headers:{'Cache-Control':'no-store'}});
 async function handle(request:Request,ctx:{params:Promise<{path:string[]}>}) {
@@ -53,11 +55,11 @@ async function handle(request:Request,ctx:{params:Promise<{path:string[]}>}) {
  if(path[0]==='skills'&&path.length>=2){const id=path[1];
  if(path.length===2&&method==='GET'){
  const list=await catalog(user.id);const skill=list.find(x=>x.id===id);if(!skill)throw new HttpError(404,'Skill not found.');return json({skill,versions:await query('SELECT number,validation,release_notes,published_at FROM versions WHERE skill_id=$1 ORDER BY number DESC',[id])});}
- if(path[2]==='draft'&&method==='GET'){await owned(user.id,id);const [draft]=await query('SELECT * FROM drafts WHERE skill_id=$1',[id]);const [latest]=draft?[]:await query('SELECT * FROM versions WHERE skill_id=$1 ORDER BY number DESC LIMIT 1',[id]);return json({draft:draft??latest});}
- if(path[2]==='draft'&&method==='POST')return json({id:await saveDraft(user.id,await body(request),id)});
- if(path[2]==='publish'&&method==='POST'){const d=await body(request);if(d.reviewed!==true)throw new HttpError(400,'Review the complete draft before publishing.');return json({number:await publish(user.id,id)});}
- if(path[2]==='restore'&&method==='POST'){const d=await body(request);return json({number:await restore(user.id,id,integer.parse(d.number))});}
- if(path[2]==='acquire'&&method==='POST'){const d=await body(request);if(d.confirm!==true)throw new HttpError(400,'Confirm simulated checkout.');await acquire(user.id,id);return json({acquired:true,charged:0,mode:'demo'});}
+ if(path.length===3&&path[2]==='draft'&&method==='GET'){await owned(user.id,id);const [draft]=await query('SELECT * FROM drafts WHERE skill_id=$1',[id]);const [latest]=draft?[]:await query('SELECT * FROM versions WHERE skill_id=$1 ORDER BY number DESC LIMIT 1',[id]);return json({draft:draft??latest});}
+ if(path.length===3&&path[2]==='draft'&&method==='POST')return json({id:await saveDraft(user.id,await body(request),id)});
+ if(path.length===3&&path[2]==='publish'&&method==='POST'){const d=await body(request);if(d.reviewed!==true)throw new HttpError(400,'Review the complete draft before publishing.');return json({number:await publish(user.id,id)});}
+ if(path.length===3&&path[2]==='restore'&&method==='POST'){const d=await body(request);return json({number:await restore(user.id,id,integer.parse(d.number))});}
+ if(path.length===3&&path[2]==='acquire'&&method==='POST'){const d=await body(request);if(d.confirm!==true)throw new HttpError(400,'Confirm simulated checkout.');await acquire(user.id,id);return json({acquired:true,charged:0,mode:'demo'});}
  if(path[2]==='versions'&&path.length===4&&method==='GET'){const version=await retrieve(user.id,id,integer.parse(Number(path[3])));return json({...version,sha256:hash(version.content)});}
  }
  if(route==='tokens'&&method==='GET')return json({tokens:await query('SELECT id,name,created_at,expires_at,revoked_at FROM api_tokens WHERE user_id=$1 ORDER BY created_at DESC',[user.id])});
