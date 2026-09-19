@@ -20,6 +20,7 @@
     "db:seed-aleksy": "tsx --env-file=.env scripts/seed-aleksy.ts"
   },
   "dependencies": {
+    "fflate": "^0.8.3",
     "lucide-react": "^0.468.0",
     "next": "^16.0.0",
     "pg": "^8.16.3",

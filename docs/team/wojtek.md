@@ -48,3 +48,9 @@ For the attached contributor workflow, deploy this revision and run `scripts/see
 ### Landing and catalogue update
 
 Deploy the merged landing/catalogue release from `origin/main`; no migration is required. Verify `/`, `/about`, `/browse` and GitHub sign-in on the public origin. Public password login controls were removed; operational credentials were not changed. All skills receive generated artwork automatically and new domains can be selected without seeding placeholder skills. Continue the separate Rosalind, Anthropic and Aleksy importer handoffs if upgrading from PR #7.
+
+### ZIP/source importer handoff
+
+Deploy the merged importer release from `origin/main`, installing the updated lockfile before rebuilding. No schema change. Verify a Java file and a ZIP folder in Creator studio, the 200 KB instructions, local file previews, explicit sharing consent and the personal/hosted API-key information notices. Live model verification remains separate from fixture-based checks.
+
+The same release makes the landing page permanent at `/` and `/about`, with the app at `/workspace`. Verify brand-to-home navigation, signed-in Open workspace and GitHub callback routing. Direct Markdown creation works without AI credentials. All creator paths are included in the browser rehearsal; live AI remains a separate deployment check.

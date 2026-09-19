@@ -1,3 +1,4 @@
+import {zipSync,strToU8} from 'fflate';
 import {chromium} from 'playwright';
 import pg from 'pg';
 import net from 'node:net';
@@ -5,7 +6,6 @@ import {randomBytes,scryptSync,createHash} from 'node:crypto';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {spawn,execFileSync} from 'node:child_process';
 import assert from 'node:assert/strict';
-import {resolve} from 'node:path';
 const origin=process.env.APP_ORIGIN||'http://localhost:3004';
 function privateUrl(value){try{return new URL(value);}catch{throw Error('Invalid private database/origin configuration.');}}
 const appUrl=privateUrl(origin);
@@ -37,7 +37,7 @@ try {
  browser=await chromium.launch({headless:true});
  let page=await browser.newPage({viewport:{width:1440,height:1000},recordVideo:{dir:evidence,size:{width:1440,height:1000}}});
  const errors=[];page.on('pageerror',e=>errors.push(e.name));
- async function login(id){const response=await page.request.post(origin+'/api/auth/login',{headers:{Origin:origin},data:{id,password:passwords[id]}});assert.equal(response.ok(),true,'Synthetic account session');await page.goto(origin);await page.getByRole('button',{name:'Creator studio',exact:true}).waitFor();}
+ async function login(id){const response=await page.request.post(origin+'/api/auth/login',{headers:{Origin:origin},data:{id,password:passwords[id]}});assert.equal(response.ok(),true,'Synthetic account session');await page.goto(origin+'/workspace');await page.getByRole('button',{name:'Creator studio',exact:true}).waitFor();}
  await page.goto(origin);await page.getByRole('heading',{name:/Turn experience/}).waitFor();
  assert.equal(await page.getByLabel('Password',{exact:true}).count(),0,'No password login form');
  await page.getByText('GitHub sign-in is temporarily unavailable.',{exact:false}).waitFor();
@@ -49,7 +49,7 @@ try {
  await page.setViewportSize({width:1440,height:1000});
  await page.goto(origin+'/browse');await page.getByRole('heading',{name:/Expertise/}).waitFor();
  await page.getByRole('link',{name:'Physics (0)',exact:true}).click();await page.getByRole('heading',{name:'No skills here yet.'}).waitFor();
- await login('wojtek');pass('public landing, empty domain and synthetic account session');
+ await login('wojtek');await page.getByRole('link',{name:'BioSkillsHub home',exact:true}).click();await page.getByRole('heading',{name:/Turn experience/}).waitFor();await page.getByRole('link',{name:'Open workspace',exact:true}).click();await page.getByRole('button',{name:'Creator studio',exact:true}).waitFor();pass('public landing, empty domain and synthetic account session');
  await page.setViewportSize({width:390,height:844});
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true,'No narrow-screen overflow');
  assert.equal(await page.getByRole('button',{name:'Sign out',exact:true}).isVisible(),true,'Mobile sign-out reachable');
@@ -79,7 +79,7 @@ try {
  await page.getByRole('status').filter({hasText:'Published immutable version 1'}).waitFor();
  const skill=(await db.query('SELECT skill_id FROM versions')).rows[0].skill_id;
  pass('review and immutable version 1 publication');
- await page.getByRole('button',{name:'Sign out',exact:true}).click();await login('efe');
+ await page.getByRole('button',{name:'Sign out',exact:true}).click();await page.waitForURL(origin+'/#sign-in');await login('efe');
  await page.getByRole('button',{name:new RegExp(title)}).click();
  await page.getByRole('dialog').waitFor();
  assert.equal(await page.evaluate(()=>document.activeElement?.getAttribute('aria-label')),'Close details');
@@ -130,19 +130,26 @@ try {
  await page.getByRole('button',{name:'Use draft in editor',exact:true}).click();pass('chat draft applied');assert.equal(await page.getByLabel('Skill title',{exact:true}).inputValue(),'Conversational fixture workflow');pass('chat editor title verified');assert.equal(await page.getByLabel('Skill instructions').inputValue(),content);pass('chat editor content verified');assert.equal(await page.getByRole('button',{name:'Publish reviewed version'}).isDisabled(),true);
  await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();assert.equal((await db.query('SELECT count(*) FROM versions')).rows[0].count,'1');
  pass('chat draft saved');await page.unroute('**/api/skill-chat');await page.setViewportSize({width:1440,height:1000});pass('chat questions, failure retry, transcript context, draft review/save and mobile layout');
+ await page.getByRole('button',{name:'New skill',exact:true}).click();await page.getByRole('button',{name:'Guided authoring',exact:true}).click();
+ await page.getByLabel('Skill title',{exact:true}).fill('Guided AI fixture');await page.getByLabel('Short description').fill('Synthetic guided AI creation fixture requiring human review.');
+ for(const label of ['Use cases','Inputs','Outputs','Procedure','Expert decisions','Limitations','Examples'])await page.getByLabel(label,{exact:true}).fill('Synthetic '+label+' fixture only.');
+ let guidedCalls=0;await page.route('**/api/generate',async route=>{guidedCalls++;assert.equal(route.request().postDataJSON().ai.apiKey,dummyKey);await route.fulfill({json:{content,mode:'ai'}});});
+ await page.getByRole('button',{name:'Generate AI draft',exact:true}).click();await page.getByLabel('Skill instructions').waitFor();assert.equal(await page.getByLabel('Skill instructions').inputValue(),content);assert.equal(guidedCalls,1);assert.equal(await page.getByRole('button',{name:'Publish reviewed version',exact:true}).isDisabled(),true);
+ await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();await page.unroute('**/api/generate');pass('guided AI creation transfers to editable review-gated draft');
  await page.getByRole('button',{name:'New skill',exact:true}).click();await page.getByRole('button',{name:'Import files with AI',exact:true}).click();
  await mkdir(evidence+'/upload-fixture/scripts',{recursive:true});
  const scriptText='print("Synthetic fixture; do not execute during import")';
  await writeFile(evidence+'/upload-fixture/SKILL.md','Describe this synthetic workflow.');await writeFile(evidence+'/upload-fixture/scripts/check.py',scriptText);await writeFile(evidence+'/upload-fixture/.env','FIXTURE_ONLY=excluded');
  let importRequests=0;
- await page.route('**/api/skill-import',async route=>{const body=route.request().postDataJSON();importRequests++;assert.equal(body.confirmed,true);assert.equal(body.ai.apiKey,dummyKey);assert.equal(body.files.length,2);assert.ok(body.files.some(f=>f.path==='upload-fixture/scripts/check.py'&&f.content===scriptText));assert.ok(!JSON.stringify(body.files).includes('FIXTURE_ONLY'));await route.fulfill({json:{message:'Review the original script before use.',draft:{title:'Imported synthetic workflow',summary:'A synthetic imported workflow for testing the review process.',domain:'Chemistry',content:content+'\n\n## Original supporting files\n\n'+scriptText}}});});
- await page.getByLabel('Choose skill files',{exact:true}).setInputFiles({name:'single.md',mimeType:'text/markdown',buffer:Buffer.from('Standalone skill fixture')});await page.getByRole('status').filter({hasText:'1 files selected locally'}).waitFor();
- await page.getByLabel('Choose skill folder',{exact:true}).setInputFiles(resolve(evidence+'/upload-fixture'));await page.getByRole('status').filter({hasText:'2 files selected locally'}).waitFor();assert.equal(importRequests,0);
- assert.equal(await page.getByRole('button',{name:'Analyse files with AI',exact:true}).isDisabled(),true);await page.getByLabel('I reviewed these files', {exact:false}).check();await page.getByRole('button',{name:'Analyse files with AI',exact:true}).click();await page.getByRole('button',{name:'Use imported draft in editor',exact:true}).waitFor();assert.equal(importRequests,1);await page.getByRole('status').filter({hasText:'AI analysis returned'}).waitFor();
+ await page.route('**/api/skill-import',async route=>{const body=route.request().postDataJSON();importRequests++;assert.equal(body.confirmed,true);assert.equal(body.ai.apiKey,dummyKey);if(importRequests===1){assert.equal(body.files.length,1);assert.equal(body.files[0].path,'Workflow.java');}else{assert.equal(body.files.length,2);assert.ok(body.files.some(f=>f.path==='upload-fixture/scripts/check.py'&&f.content===scriptText));}assert.ok(!JSON.stringify(body.files).includes('FIXTURE_ONLY'));await route.fulfill({json:{message:'Review the original script before use.',draft:{title:'Imported synthetic workflow',summary:'A synthetic imported workflow for testing the review process.',domain:'Chemistry',content:content+'\n\n## Original supporting files\n\n'+scriptText}}});});
+ await page.getByRole('note',{name:'How your API key is handled'}).waitFor();
+ await page.getByLabel('Choose a single file or ZIP folder',{exact:true}).setInputFiles({name:'Workflow.java',mimeType:'text/markdown',buffer:Buffer.from('Standalone skill fixture')});await page.getByRole('status').filter({hasText:'1 files selected locally'}).waitFor();assert.equal(await page.getByRole('button',{name:'Analyse files with AI',exact:true}).isDisabled(),true);await page.getByLabel('I reviewed these files',{exact:false}).check();await page.getByRole('button',{name:'Analyse files with AI',exact:true}).click();await page.getByRole('button',{name:'Use imported draft in editor',exact:true}).waitFor();assert.equal(importRequests,1);
+ await page.getByLabel('Choose a single file or ZIP folder',{exact:true}).setInputFiles({name:'workflow.zip',mimeType:'application/zip',buffer:Buffer.from(zipSync({'upload-fixture/SKILL.md':strToU8('Describe this synthetic workflow.'),'upload-fixture/scripts/check.py':strToU8(scriptText),'upload-fixture/.env':strToU8('FIXTURE_ONLY=excluded')}))});await page.getByRole('status').filter({hasText:'2 files selected locally'}).waitFor();assert.equal(importRequests,1);
+ assert.equal(await page.getByRole('button',{name:'Analyse files with AI',exact:true}).isDisabled(),true);await page.getByLabel('I reviewed these files', {exact:false}).check();await page.getByRole('button',{name:'Analyse files with AI',exact:true}).click();await page.getByRole('button',{name:'Use imported draft in editor',exact:true}).waitFor();assert.equal(importRequests,2);await page.getByRole('status').filter({hasText:'AI analysis returned'}).waitFor();
  await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true,'Importer fits mobile');await page.screenshot({path:evidence+'/file-import-mobile.png',fullPage:true});
  await page.getByRole('button',{name:'Use imported draft in editor',exact:true}).click();assert.ok((await page.getByLabel('Skill instructions').inputValue()).includes(scriptText));assert.equal(await page.getByRole('button',{name:'Publish reviewed version'}).isDisabled(),true);
  await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();assert.equal((await db.query('SELECT count(*) FROM versions')).rows[0].count,'1');
- await page.unroute('**/api/skill-import');await page.setViewportSize({width:1440,height:1000});pass('file and folder selection, excluded private file, explicit AI consent, source retention and review-gated import');await page.reload();await page.getByRole('button',{name:'AI settings',exact:true}).click();await page.getByText('No hosted AI is configured.',{exact:false}).waitFor();
+ await page.unroute('**/api/skill-import');await page.setViewportSize({width:1440,height:1000});pass('Java file and ZIP selection, excluded private file, explicit AI consent, source retention and review-gated import');await page.reload();await page.getByRole('button',{name:'AI settings',exact:true}).click();await page.getByText('No hosted AI is configured.',{exact:false}).waitFor();
  pass('personal key explicit request, no browser persistence, refresh clears key');
  await page.getByRole('button',{name:'Connect agent',exact:true}).click();
  await page.getByLabel('Workspace name').fill('Disposable rehearsal');
@@ -160,6 +167,21 @@ try {
  await page.getByRole('button',{name:'Revoke',exact:true}).click();await page.getByRole('button',{name:'Revoked',exact:true}).waitFor();
  let revoked=false;try{execFileSync('python3',['scripts/agent_client.py','list'],{env,stdio:'pipe'});}catch{revoked=true;}assert.equal(revoked,true);
  assert.deepEqual(errors,[]);pass('revocation rejects helper access; no browser page errors');
+ // Direct Markdown and editing must work with no hosted or personal AI key.
+ let unexpectedAI=0;await page.route('**/api/generate',async route=>{unexpectedAI++;await route.abort();});
+ await page.getByRole('button',{name:'Creator studio',exact:true}).click();await page.getByRole('button',{name:'New skill',exact:true}).click();await page.getByRole('button',{name:'Upload / edit Markdown',exact:true}).click();
+ pass('manual Markdown editor opened');
+ const manualContent=content+'\n\n<!-- '+('large Markdown fixture '.repeat(5000))+' -->';
+ await page.getByLabel('Import a Markdown file',{exact:false}).setInputFiles({name:'workflow.MD',mimeType:'text/markdown',buffer:Buffer.from(manualContent)});
+ await page.getByRole('status').filter({hasText:'Markdown loaded locally'}).waitFor();pass('manual Markdown file loaded');assert.equal(await page.getByLabel('Skill instructions').inputValue(),manualContent);
+ assert.equal(await page.getByRole('note',{name:'How your API key is handled'}).count(),0,'API key notice does not appear as a Markdown error');
+ await page.getByLabel('Skill title',{exact:true}).fill('Manual Markdown fixture');await page.getByLabel('Short description').fill('A fixture proving that Markdown creation does not require an AI key.');
+ await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();
+ pass('manual Markdown draft saved');
+ const editedContent=manualContent+'\nManual edit verified.';await page.getByLabel('Skill instructions').fill(editedContent);await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();
+ pass('manual edit saved');assert.equal(await page.getByRole('button',{name:'Publish reviewed version',exact:true}).isDisabled(),true);await page.getByLabel('I have reviewed the full instructions',{exact:false}).check();await page.getByRole('button',{name:'Publish reviewed version',exact:true}).click();await page.getByRole('status').filter({hasText:'Published immutable version 1'}).waitFor();
+ assert.equal((await db.query('SELECT content FROM versions WHERE title=$1',['Manual Markdown fixture'])).rows[0].content,editedContent);assert.equal(unexpectedAI,0);await page.unroute('**/api/generate');
+ assert.deepEqual(errors,[]);pass('large uppercase Markdown upload, manual editing, save/review/publish with no AI key or provider calls');
  await writeFile(evidence+'/result.json',JSON.stringify({time:new Date().toISOString(),scope:'Disposable schema in Wojtek database; synthetic software only',steps},null,2),{mode:0o600});
 } catch(e) {console.error('Rehearsal failed:',e.name,'after',steps.at(-1)||'startup','(details suppressed to protect credentials)');process.exitCode=1;}
 finally {
