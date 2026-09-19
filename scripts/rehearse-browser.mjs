@@ -90,7 +90,7 @@ try {
  assert.equal(await page.locator('body').textContent().then(t=>t.includes('## Procedure')),false,'Public page omits instructions');
  await page.screenshot({path:evidence+'/public-catalog.png',fullPage:true});
  await page.context().close(); // Stop fallback recording before any token is created.
- page=await browser.newPage({viewport:{width:1440,height:1000}});page.on('pageerror',e=>errors.push(e.name));await login('efe');
+ page=await browser.newPage({viewport:{width:1440,height:1000}});page.on('pageerror',e=>errors.push(e.name));page.setDefaultTimeout(15000);await login('efe');
  await page.getByRole('button',{name:'AI settings',exact:true}).click();
  const dummyKey='sk-browser-fixture-not-a-real-key';
  await page.getByLabel('OpenAI API key',{exact:true}).fill(dummyKey);await page.getByRole('checkbox').check();await page.getByRole('button',{name:'Enable personal key',exact:true}).click();
@@ -99,7 +99,18 @@ try {
  let personalSent=false;
  await page.route('**/api/recommend',async route=>{const body=route.request().postDataJSON();assert.equal(body.ai.apiKey,dummyKey);personalSent=true;await route.fulfill({json:{recommendations:[],note:'Fixture response'}});});
  await page.getByRole('button',{name:'Explore',exact:true}).click();await page.getByLabel('Research question').fill('Synthetic workflow');await page.getByRole('button',{name:'Find skills',exact:true}).click();await page.getByText('Fixture response',{exact:true}).waitFor();assert.equal(personalSent,true);
- await page.unroute('**/api/recommend');await page.reload();await page.getByRole('button',{name:'AI settings',exact:true}).click();await page.getByText('No hosted AI is configured.',{exact:false}).waitFor();
+ pass('personal key recommendation request');await page.unroute('**/api/recommend');
+ await page.getByRole('button',{name:'Creator studio',exact:true}).click();await page.getByRole('button',{name:'Chat with AI',exact:true}).click();
+ pass('chat editor opened');let chatCount=0;
+ await page.route('**/api/skill-chat',async route=>{const body=route.request().postDataJSON();assert.equal(body.ai.apiKey,dummyKey);chatCount++;if(chatCount===2){await route.fulfill({status:502,json:{error:'Fixture provider failure'}});return;}assert.equal(body.messages[0].content,'I count fluorescent objects.');if(body.action==='draft'){assert.ok(body.messages.some(m=>m.content==='I use TIFF images.'));await route.fulfill({json:{message:'Review the missing parameters.',draft:{title:'Conversational fixture workflow',summary:'Synthetic conversation-generated workflow for browser testing only.',domain:'Imaging',content}}});}else await route.fulfill({json:{message:'Which image format do you use?',draft:null}});});
+ await page.getByLabel('Your workflow or answer').fill('I count fluorescent objects.');await page.getByRole('button',{name:'Send to skill assistant',exact:true}).click();await page.getByText('Which image format do you use?',{exact:true}).waitFor();pass('chat follow-up received');
+ await page.getByLabel('Your workflow or answer').fill('I use TIFF images.');await page.getByRole('button',{name:'Send to skill assistant',exact:true}).click();await page.getByText('Fixture provider failure',{exact:true}).waitFor();pass('chat failure preserved');assert.equal(await page.getByLabel('Your workflow or answer').inputValue(),'I use TIFF images.');
+ await page.getByRole('button',{name:'Create skill draft',exact:true}).click();await page.getByRole('button',{name:'Use draft in editor',exact:true}).waitFor();pass('chat preview received');const draftDownloadReady=page.waitForEvent('download');await page.getByRole('button',{name:'Download draft SKILL.md',exact:true}).click();const draftDownload=await draftDownloadReady;assert.equal(await readFile(await draftDownload.path(),'utf8'),content);
+ await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true,'Chat preview fits mobile');
+ await page.screenshot({path:evidence+'/chat-builder-mobile.png',fullPage:true});
+ await page.getByRole('button',{name:'Use draft in editor',exact:true}).click();pass('chat draft applied');assert.equal(await page.getByLabel('Skill title',{exact:true}).inputValue(),'Conversational fixture workflow');pass('chat editor title verified');assert.equal(await page.getByLabel('Skill instructions').inputValue(),content);pass('chat editor content verified');assert.equal(await page.getByRole('button',{name:'Publish reviewed version'}).isDisabled(),true);
+ await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();assert.equal((await db.query('SELECT count(*) FROM versions')).rows[0].count,'1');
+ pass('chat draft saved');await page.unroute('**/api/skill-chat');await page.setViewportSize({width:1440,height:1000});pass('chat questions, failure retry, transcript context, draft review/save and mobile layout');await page.reload();await page.getByRole('button',{name:'AI settings',exact:true}).click();await page.getByText('No hosted AI is configured.',{exact:false}).waitFor();
  pass('personal key explicit request, no browser persistence, refresh clears key');
  await page.getByRole('button',{name:'Connect agent',exact:true}).click();
  await page.getByLabel('Workspace name').fill('Disposable rehearsal');

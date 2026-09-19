@@ -11,3 +11,4 @@
 .public-catalog a:not(.primary){color:var(--green)}.public-catalog header>a:first-child{font-family:Manrope,sans-serif;font-weight:750;font-size:20px;letter-spacing:-1px}
 
 .usage-guide{margin-top:24px;border-top:1px solid var(--line,#ddd);padding-top:20px}.usage-guide li{margin:12px 0;line-height:1.6}.usage-guide ol{padding-left:22px}.usage-guide details{margin:18px 0}.usage-guide summary{cursor:pointer;font-weight:600}.command{white-space:pre-wrap;overflow-wrap:anywhere}.usage-guide textarea{width:100%}
+.chat-log{max-height:420px;overflow-y:auto;margin:16px 0}.chat-message{padding:14px;margin:10px 0;background:#f3f6f2;border-radius:8px}.chat-message.user{background:#edf1fa}.chat-message p{white-space:pre-wrap;overflow-wrap:anywhere}.chat-preview{margin-top:22px}.skill-chat small{display:block}
