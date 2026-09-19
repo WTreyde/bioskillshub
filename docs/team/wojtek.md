@@ -44,3 +44,7 @@ Ownership correction: after deploying this revision, run `scripts/seed-rosalind.
 The Anthropic source entry uses its own `scripts/seed-anthropic.ts` dry-run/apply importer, with no owner argument. The owner is the `anthropic` attribution profile. Deploy then follow [the handoff](../../science/anthropic/README.md); do not run the upstream campaign or reset an existing account's credentials.
 
 For the attached contributor workflow, deploy this revision and run `scripts/seed-aleksy.ts`, first dry run, then `--apply`, with no owner argument. It creates/reuses Aleksy Kwiatkowski without issuing or changing existing login credentials. The same release adds the AI file/folder importer; verify its UI without paid calls unless separately authorized. No migration is required.
+
+### Landing and catalogue update
+
+Deploy the merged landing/catalogue release from `origin/main`; no migration is required. Verify `/`, `/about`, `/browse` and GitHub sign-in on the public origin. Public password login controls were removed; operational credentials were not changed. All skills receive generated artwork automatically and new domains can be selected without seeding placeholder skills. Continue the separate Rosalind, Anthropic and Aleksy importer handoffs if upgrading from PR #7.
