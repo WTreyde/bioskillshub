@@ -182,6 +182,23 @@ try {
  pass('manual edit saved');assert.equal(await page.getByRole('button',{name:'Publish reviewed version',exact:true}).isDisabled(),true);await page.getByLabel('I have reviewed the full instructions',{exact:false}).check();await page.getByRole('button',{name:'Publish reviewed version',exact:true}).click();await page.getByRole('status').filter({hasText:'Published immutable version 1'}).waitFor();
  assert.equal((await db.query('SELECT content FROM versions WHERE title=$1',['Manual Markdown fixture'])).rows[0].content,editedContent);assert.equal(unexpectedAI,0);await page.unroute('**/api/generate');
  assert.deepEqual(errors,[]);pass('large uppercase Markdown upload, manual editing, save/review/publish with no AI key or provider calls');
+ // Invalid uploads and draft validation must preserve the last valid instructions.
+ await page.getByLabel('Import a Markdown file',{exact:false}).setInputFiles({name:'invalid.md',mimeType:'text/markdown',buffer:Buffer.from([0xff,0xfe])});
+ await page.getByRole('alert').filter({hasText:'must use UTF-8'}).waitFor();assert.equal(await page.getByLabel('Skill instructions').inputValue(),editedContent);
+ await page.getByLabel('Import a Markdown file',{exact:false}).setInputFiles({name:'oversized.md',mimeType:'text/markdown',buffer:Buffer.alloc(300001,65)});
+ await page.getByRole('alert').filter({hasText:'300 KB'}).waitFor();assert.equal(await page.getByLabel('Skill instructions').inputValue(),editedContent);
+ await page.getByLabel('Skill instructions').fill('# Missing required sections '+('x'.repeat(100)));await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('alert').filter({hasText:'Missing nonempty Markdown sections'}).waitFor();
+ assert.equal((await db.query('SELECT content FROM versions WHERE title=$1',['Manual Markdown fixture'])).rows[0].content,editedContent);
+ await page.getByLabel('Skill instructions').fill(editedContent);await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();
+ pass('failed encoding/oversize uploads preserve editor; invalid draft cannot change a release; retry succeeds');
+ await page.getByRole('button',{name:'Explore',exact:true}).click();await page.getByRole('button',{name:/Manual Markdown fixture/}).click();
+ await page.getByRole('button',{name:'Restore selected version as a new release',exact:true}).click();await page.getByRole('status').filter({hasText:'Restored as new version 2. Existing releases remain unchanged.'}).waitFor();
+ await page.getByRole('button',{name:/Add to library/}).click();await page.getByRole('button',{name:'Confirm demo acquisition',exact:true}).click();
+ await page.getByRole('button',{name:'Read selected version',exact:true}).click();await page.locator('.skill-content').waitFor();assert.equal(await page.locator('.skill-content').textContent(),editedContent);
+ await page.getByRole('dialog').getByRole('combobox').selectOption('1');await page.getByRole('button',{name:'Read selected version',exact:true}).click();await page.locator('.skill-content').waitFor();assert.equal(await page.locator('.skill-content').textContent(),editedContent);
+ await page.getByRole('button',{name:'Close details',exact:true}).click();pass('creator restore and explicit earlier-version retrieval preserve content');
+ await db.query("UPDATE sessions SET expires_at=now()-interval '1 second' WHERE user_id='efe'");await page.reload();await page.waitForURL(origin+'/#sign-in');await page.getByRole('heading',{name:/Turn experience/}).waitFor();
+ assert.equal(await page.getByRole('button',{name:'Creator studio',exact:true}).count(),0);assert.deepEqual(errors,[]);pass('expired session returns to public landing without cached workspace');
  await writeFile(evidence+'/result.json',JSON.stringify({time:new Date().toISOString(),scope:'Disposable schema in Wojtek database; synthetic software only',steps},null,2),{mode:0o600});
 } catch(e) {console.error('Rehearsal failed:',e.name,'after',steps.at(-1)||'startup','(details suppressed to protect credentials)');process.exitCode=1;}
 finally {
