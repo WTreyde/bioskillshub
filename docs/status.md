@@ -51,3 +51,9 @@ Validation for this change: typecheck, production build, PostgreSQL provider/acc
 Creator studio now includes Chat with AI: describe a workflow, answer targeted questions, explicitly generate a skill preview, then transfer it to the editable review/save/publish flow. Missing evidence must remain labelled as missing. Conversations are bounded, temporary and never auto-published. The feature uses the same personal/hosted OpenAI settings and sanitized provider adapter. Deployment and a paid live-provider smoke test remain outstanding; no migration is required.
 
 Validation passed: TypeScript, production build, PostgreSQL conversation/access/provider lifecycle, all sixteen Python tests and Chromium desktop/mobile flows. Browser coverage includes follow-up questions, preserved input after failure, draft preview/download, transfer to the editor, review gating and private draft saving. Provider responses are fixtures; no live AI or scientific validation is implied.
+
+## Literature starter catalogue — 19 September 2026
+
+Prepared four free, attributed literature checklists for Imaging, Genomics, Chemistry and Structural biology. Each includes scope, inputs, outputs, decisions, limitations, examples and a DOI citation; all explicitly remain expert-review pending and experimentally unvalidated. The transactional importer preserves accounts, credentials, existing releases, drafts and entitlements. See [source catalogue and import instructions](../science/literature/README.md). Public deployment/import requires the integration administrator; a personal database import does not update the website.
+
+Typecheck, production build, PostgreSQL importer/access tests and sixteen Python tests passed. All four entries were imported into Wojtek's personal database; a repeat dry run reported all four as existing. Integration database import remains pending. No credentials or teammate checkouts were modified, and no live model calls were made.
