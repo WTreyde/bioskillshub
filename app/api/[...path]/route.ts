@@ -1,3 +1,4 @@
+import {MAX_JSON_BYTES} from '@/lib/upload-limits';
 import {NextResponse} from 'next/server';
 import {randomUUID} from 'node:crypto';
 import {z,ZodError} from 'zod';
@@ -13,7 +14,13 @@ import {githubConfigured,githubStart,githubCallback} from '@/lib/github';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 const integer=z.number().int().positive();
-async function body(r:Request) {if(!r.headers.get('content-type')?.includes('application/json'))throw new HttpError(415,'Send JSON.');const text=await r.text();if(Buffer.byteLength(text)>90000)throw new HttpError(413,'Request exceeds 90 KB.');try{return JSON.parse(text);}catch{throw new HttpError(400,'Invalid JSON.');}}
+async function body(r:Request) {
+ if(!r.headers.get('content-type')?.includes('application/json'))throw new HttpError(415,'Send JSON.');
+ const reader=r.body?.getReader();if(!reader)throw new HttpError(400,'Missing JSON.');
+ const chunks:Uint8Array[]=[];let size=0;
+ while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>MAX_JSON_BYTES){await reader.cancel();throw new HttpError(413,'Encoded request is too large.');}chunks.push(value);}
+ try{return JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{throw new HttpError(400,'Invalid JSON.');}
+}
 const json=(value:unknown,status=200)=>NextResponse.json(value,{status,headers:{'Cache-Control':'no-store'}});
 async function handle(request:Request,ctx:{params:Promise<{path:string[]}>}) {
  try {
