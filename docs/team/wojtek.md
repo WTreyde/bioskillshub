@@ -36,3 +36,5 @@ The `codex/wojtek-ai-handoff` change adds optional tab-memory OpenAI keys and ex
 The follow-up `codex/wojtek-chat-builder` adds conversational skill creation. Deploy latest merged main to include both the personal-key/usage change and this chat builder. No migration or new credentials are needed; provider verification still requires an explicitly configured live key.
 
 The literature catalogue has an explicit dry-run/apply importer, using an existing curator account. After deploying the merged revision, the integration administrator should follow [the literature import handoff](../../science/literature/README.md). Do not run db:setup or reset credentials to import these entries.
+
+For the Rosalind catalogue, deploy the merged revision and run the separate `scripts/seed-rosalind.ts` dry run/apply procedure in [the handoff](../../science/rosalind/README.md). This imports proposed instructions only; testing actual Workbench tools still needs an authorized user. The literature import remains independent.

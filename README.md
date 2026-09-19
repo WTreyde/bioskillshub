@@ -68,3 +68,7 @@ Create a skill conversationally in **Creator studio → Chat with AI**: explain 
 ## Literature starter catalogue
 
 Four free, cited review checklists cover Imaging, Genomics, Chemistry and Structural biology. Populate an existing database with `npm run db:seed-literature -- --owner wojtek --apply` after reviewing the default dry run. See [sources, limitations and container import instructions](science/literature/README.md). These are literature adaptations awaiting expert review, not validated scientific protocols.
+
+## Rosalind Workbench skills
+
+Three free workflow proposals cover FASTQ quality review, structure inspection and sequence alignment. See [manual handoff, verification limits and import instructions](science/rosalind/README.md). Workbench execution remains unverified; these entries do not establish an automatic integration or grant Workbench access.
