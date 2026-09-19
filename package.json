@@ -13,7 +13,8 @@
     "db:recovery": "tsx --env-file=.env scripts/verify-recovery.ts",
     "db:setup": "tsx --env-file=.env scripts/setup.ts",
     "test": "tsx --env-file=.env --test tests/*.test.ts",
-    "env:check": "node --env-file=.env scripts/check-workspace.mjs"
+    "env:check": "node --env-file=.env scripts/check-workspace.mjs",
+    "db:seed-literature": "tsx --env-file=.env scripts/seed-literature.ts"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
