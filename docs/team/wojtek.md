@@ -13,3 +13,12 @@ Fill science/admet/endpoint.example.json into a private real manifest, run prefl
 Provision CPU workspace only after Brev login and price verification. Initial cumulative Brev cap $100, absolute $1,000; OpenAI $100 separate. Install per-user Codex and SSH setup. The CPU host can remain up overnight; bound and stop all GPU workers. Keep the integration clone separate from active development.
 
 Run npm test against the isolated test schema before integration. Test real provider calls only after environment credentials are configured, with limited requests. Record provider/model and token usage.
+
+## Development environment verified — 19 September 2026
+
+- Personal checkout: `/home/wojtek/bioskillshub`; `codex/wojtek-setup` created from merged `origin/main` (`fa775ce`). Future work should use a new `codex/wojtek-<change>` branch from `origin/main` with a clean tree.
+- Node 22.23.2, npm 10.9.8 and Python 3.10.12 are available; project dependencies are installed. Docker CLI/Compose are installed, but personal accounts rely on the integration administrator to manage containers.
+- Private configuration uses `bsh-wojtek`, app origin `http://localhost:3004` and the personal PostgreSQL database at `127.0.0.1:5442`. `.env` permissions are `0600`; existing credentials were preserved.
+- `npm run typecheck`, `npm run build`, `npm test` and all three Python unit tests passed. The lifecycle test created and removed its disposable schema in the personal database. Under the Codex sandbox, tests required permission for IPC/database access and the build required a retry outside the sandbox after a TypeScript subprocess failure.
+- `npm run dev -- --port 3004` started successfully: `/` returned 200, `/api/auth/me` returned an anonymous session and `/api/catalog` returned 401. The temporary server was stopped after verification. Browser sign-in and a laptop SSH tunnel were not exercised.
+- GitHub CLI was absent; a temporary CLI was downloaded and Wojtek completed personal GitHub authentication. The setup branch was successfully pushed to `origin`. Git author identity is unset in this clone; this follow-up uses the public Wojtek Treyde identity from the PR #1 merge commit for its commits only. Set a preferred Git author identity for future work; never reuse another teammate's credentials.
