@@ -85,3 +85,13 @@ All required checks passed: TypeScript, production build, PostgreSQL ownership/i
 Added a shared project explanation at the unauthenticated landing page and `/about`, stable per-skill abstract artwork, and 16 selectable scientific domains including empty categories. Domain choices are shared with draft validation and AI authoring/import prompts. Public sign-in now offers GitHub only; no team-account/password form is displayed. Legacy team credentials and the password API remain unchanged for operational compatibility. GitHub must be configured on the integration host for website sign-in.
 
 TypeScript, production build, PostgreSQL tests, sixteen Python tests and the desktop/mobile browser rehearsal passed. Browser coverage includes the public introduction, empty domain browsing, Physics publication/acquisition, images and absence of the password form. GitHub live authorization was not exercised. No migration or image service is needed; deploy the merged release to update the public website.
+
+## Larger source and ZIP imports
+
+Creator studio accepts a single UTF-8 source file in any programming language or a ZIP-compressed folder. Upload and total expanded content limits are 200,000 bytes, with at most 100 files; generated skills allow 300,000 UTF-8 bytes. ZIP contents are decoded locally, bounded and previewed before explicit sharing consent; scripts are never executed and publication still requires review. AI settings and the importer visibly explain personal-key transit through BioSkillsHub to OpenAI, non-storage, and the hosted-key alternative.
+
+Typecheck, build, PostgreSQL tests, sixteen Python tests and desktop/mobile browser rehearsal passed. Coverage includes Java, ZIPs, corrupt/encrypted/oversized archives, symlinks, excluded files, consent, source retention, and saving/publishing/retrieving a large converted skill. No paid provider calls were made. Deploy the merged release with `npm ci` and rebuild; no database migration is required.
+
+### Landing navigation and complete authoring verification
+
+`/` and `/about` now render the same project landing page even for signed-in users. The authenticated app is at `/workspace`, the brand links home, signed-out workspace visits return to the sign-in panel, and GitHub callbacks open the workspace. No OAuth callback registration change is required. Direct Markdown upload accepts `.md`/`.MD`, reports encoding problems, and explicitly explains that no AI key is needed. Browser coverage now includes each creator path: guided template, guided AI, conversation, single Java import, ZIP import, and large direct Markdown upload/edit/save/review/publication without AI. Model responses remain fixtures; live provider availability is not implied.

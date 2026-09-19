@@ -1,7 +1,8 @@
 import { z } from 'zod';
+import {MAX_SKILL_BYTES} from './upload-limits';
 import {domains} from './domains';
 export const fields=['Use cases','Inputs','Outputs','Procedure','Expert decisions','Limitations','Examples'] as const;
-export const draftSchema=z.object({title:z.string().trim().min(5).max(120),summary:z.string().trim().min(20).max(600),domain:z.enum(domains),price_cents:z.number().int().min(0).max(100000),content:z.string().min(80).max(60000),validation:z.string().trim().min(5).max(200).default('Expert review pending'),release_notes:z.string().max(500).default('')});
+export const draftSchema=z.object({title:z.string().trim().min(5).max(120),summary:z.string().trim().min(20).max(600),domain:z.enum(domains),price_cents:z.number().int().min(0).max(100000),content:z.string().min(80).max(MAX_SKILL_BYTES).refine(s=>new TextEncoder().encode(s).length<=MAX_SKILL_BYTES,'Skill exceeds 300 KB'),validation:z.string().trim().min(5).max(200).default('Expert review pending'),release_notes:z.string().max(500).default('')});
 export function validateContent(content:string) {
  const missing=fields.filter(f=>!new RegExp(`^## ${f}\\s*\\n\\s*\\S`,'m').test(content));
  if(missing.length) throw new Error(`Missing nonempty Markdown sections: ${missing.join(', ')}`);

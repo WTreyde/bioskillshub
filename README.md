@@ -1,6 +1,6 @@
 # BioSkillsHub
 
-Expert scientific workflows, available to research agents through a versioned, access-controlled catalogue. The public landing page at `/` and About page at `/about` explain the project. Browse published metadata and filter all 16 domains (including empty categories) at `/browse`; instruction downloads require sign-in and acquisition.
+Expert scientific workflows, available to research agents through a versioned, access-controlled catalogue. The landing page at `/` and its `/about` alias explain the project for all visitors. The signed-in app lives at `/workspace`; clicking its BioSkillsHub logo returns home. Browse published metadata and filter all 16 domains (including empty categories) at `/browse`; instruction downloads require sign-in and acquisition.
 
 ## Run locally
 
@@ -77,6 +77,6 @@ Three free workflow proposals cover FASTQ quality review, structure inspection a
 
 An Anthropic-owned entry provides an attributed guide to the released protein-binder campaign bundle. It links to a pinned source revision and does not launch the campaign. See [scope, provenance and import instructions](science/anthropic/README.md).
 
-Creator studio also supports **Import files with AI** for text skill files and folders containing scripts. Review the selected files before sending them, then review the converted draft before saving/publishing. Original sources remain embedded as text in the Markdown download. See [file import instructions and limits](docs/using-skills.md#import-files-or-a-folder-with-ai).
+Creator studio also supports **Import files with AI** for a single UTF-8 source file in any programming language, or a ZIP-compressed folder containing scripts (200 KB upload and expanded contents). Review the selected files before sending them, then review the converted draft before saving/publishing. Original sources remain embedded as text in the Markdown download. See [file import instructions and limits](docs/using-skills.md#import-files-or-a-folder-with-ai).
 
 The attached chemical reaction prediction workflow is available as a free contributor skill owned by ak; [import instructions](science/ak/README.md) preserve the original attachment and existing credentials.
