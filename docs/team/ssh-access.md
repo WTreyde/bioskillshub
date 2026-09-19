@@ -46,12 +46,14 @@ Complete your own Codex authentication. Then in the desktop app go to Settings â
 
 ## Development ports
 
-| Account | App | Database | Branch |
+| Account | App | Database | Original workspace branch |
 |---|---:|---:|---|
 | efe | 3001 | 5439 | codex/efe-workspace |
 | leandre | 3002 | 5440 | codex/leandre-workspace |
 | maxim | 3003 | 5441 | codex/maxim-workspace |
 | wojtek | 3004 | 5442 | codex/wojtek-workspace |
+
+The branches above describe initial provisioning. PR #1 is merged; start new changes from `origin/main` on a short-lived `codex/<name>-<change>` branch as described in [the setup runbook](../setup.md).
 
 Dependencies and separate databases are ready. Start your server using `npm run dev -- --port YOUR_PORT`. Forward the same port from your laptop using `ssh -N -L YOUR_PORT:127.0.0.1:YOUR_PORT bioskills-me` and open `http://localhost:YOUR_PORT`.
 

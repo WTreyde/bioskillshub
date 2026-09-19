@@ -12,7 +12,7 @@ Install Git, Node 22+, Python 3.10+, Docker and Docker Compose using official di
 
 Create Linux accounts `efe`, `leandre`, `maxim`, `wojtek` and `integration`, with home directories and individual SSH public keys. Share private account credentials out of band. Grant only the permissions needed; Docker group membership is effectively root and must be intentional. Prefer the integration owner managing shared infrastructure.
 
-Each person clones https://github.com/WTreyde/bioskillshub into their own home. Until PR #1 is reviewed and merged, use `git clone --branch codex/platform-review https://github.com/WTreyde/bioskillshub.git`: `main` currently contains only the empty review baseline. Use separate Docker Compose project names, database volumes and app ports:
+PR #1 has merged into `main`. Each person clones `git clone --branch main https://github.com/WTreyde/bioskillshub.git` into their own home. For each new change, start with a clean personal checkout, run `git fetch origin`, then `git switch -c codex/<name>-<change> origin/main`. Open a PR targeting `main` and obtain teammate review before integration. Use separate Docker Compose project names, database volumes and app ports:
 
 | Account | App port | Database port | Compose project |
 |---|---:|---:|---|
@@ -39,7 +39,7 @@ Keep CPU services in Docker with restart policies. Use tmux for a long-lived rem
 ## Verified workspace handoff (19 September)
 
 - Workspace: `bioskillshub-cpu`; connect with `brev refresh`, then `brev shell bioskillshub-cpu`. The Brev-generated SSH endpoint can change; refresh before troubleshooting stale routes.
-- Separate clones: `/home/{efe,leandre,maxim,wojtek,integration}/bioskillshub`. Personal branches are `codex/<name>-workspace`; integration tracks `codex/platform-review` pending review.
+- Separate clones: `/home/{efe,leandre,maxim,wojtek,integration}/bioskillshub`. The original personal branches were `codex/<name>-workspace`; new work branches from `origin/main`. The integration owner should update the integration checkout to merged `main` with a clean tree; this handoff does not imply that deployed code has been updated.
 - Personal accounts have locked passwords and private home directories. Their supplied individual SSH public keys are installed; see [team SSH instructions](team/ssh-access.md). Do not distribute the admin account or its Brev identity file to teammates.
 - Each personal clone has installed Node dependencies, a private `.env`, a separately initialized PostgreSQL container/volume and generated app passwords under `.local/`. Containers are managed by the integration administrator; personal accounts have no Docker/root privileges.
 - Once personal SSH access is enabled: `cd ~/bioskillshub`, authenticate `codex` yourself, then start `npm run dev -- --port <allocated-port>`. Do not copy another person's Codex authentication.
