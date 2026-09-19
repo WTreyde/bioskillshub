@@ -1,0 +1,35 @@
+[
+  {
+    "id": "rosalind-fastq-review",
+    "file": "fastq-review.md",
+    "title": "Rosalind FASTQ quality review",
+    "domain": "Genomics",
+    "summary": "Plan sequencing QC in Rosalind NGS Analysis Workbench with metadata, approval and evidence checks. Workbench execution unverified.",
+    "price_cents": 0,
+    "validation": "Workbench execution unverified; expert review pending; not scientifically validated",
+    "release_notes": "Initial BioSkillsHub workflow proposal; capability docs checked 2026-09-19",
+    "source_url": "https://developers.openai.com/blog/rosalind-workbench"
+  },
+  {
+    "id": "rosalind-structure-review",
+    "file": "structure-review.md",
+    "title": "Rosalind protein structure inspection",
+    "domain": "Structural biology",
+    "summary": "Inspect an existing structure with the Rosalind molecular viewer and document uncertainty. Workbench execution unverified.",
+    "price_cents": 0,
+    "validation": "Workbench execution unverified; expert review pending; not scientifically validated",
+    "release_notes": "Initial BioSkillsHub workflow proposal; capability docs checked 2026-09-19",
+    "source_url": "https://developers.openai.com/blog/rosalind-workbench"
+  },
+  {
+    "id": "rosalind-alignment-review",
+    "file": "alignment-review.md",
+    "title": "Rosalind sequence alignment inspection",
+    "domain": "Genomics",
+    "summary": "Review protein sequence comparisons with Rosalind’s alignment viewer and preserve position mappings. Workbench execution unverified.",
+    "price_cents": 0,
+    "validation": "Workbench execution unverified; expert review pending; not scientifically validated",
+    "release_notes": "Initial BioSkillsHub workflow proposal; capability docs checked 2026-09-19",
+    "source_url": "https://developers.openai.com/blog/rosalind-workbench"
+  }
+]
