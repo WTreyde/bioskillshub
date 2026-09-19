@@ -40,7 +40,7 @@ Keep CPU services in Docker with restart policies. Use tmux for a long-lived rem
 
 - Workspace: `bioskillshub-cpu`; connect with `brev refresh`, then `brev shell bioskillshub-cpu`. The Brev-generated SSH endpoint can change; refresh before troubleshooting stale routes.
 - Separate clones: `/home/{efe,leandre,maxim,wojtek,integration}/bioskillshub`. Personal branches are `codex/<name>-workspace`; integration tracks `codex/platform-review` pending review.
-- Personal accounts have locked passwords and private home directories. Their individual SSH public keys still need installation. Do not distribute the admin account or its Brev identity file to teammates.
+- Personal accounts have locked passwords and private home directories. Their supplied individual SSH public keys are installed; see [team SSH instructions](team/ssh-access.md). Do not distribute the admin account or its Brev identity file to teammates.
 - Each personal clone has installed Node dependencies, a private `.env`, a separately initialized PostgreSQL container/volume and generated app passwords under `.local/`. Containers are managed by the integration administrator; personal accounts have no Docker/root privileges.
 - Once personal SSH access is enabled: `cd ~/bioskillshub`, authenticate `codex` yourself, then start `npm run dev -- --port <allocated-port>`. Do not copy another person's Codex authentication.
 - Integration passwords are preserved in `/home/integration/bioskillshub/.local/` as well as the app container. Administrators can retrieve them privately with sudo. These differ from locally generated development passwords.
