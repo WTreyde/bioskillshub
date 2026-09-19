@@ -1,0 +1,13 @@
+[
+  {
+    "id": "aleksy-ml-chemical-reaction-prediction",
+    "title": "ML for Chemical Reaction Prediction",
+    "summary": "A practitioner workflow covering molecular representations, featurisation, data hygiene, leakage, evaluation and interpretable reaction predictions.",
+    "domain": "Chemistry",
+    "price_cents": 0,
+    "validation": "Contributor-provided guidance; scientific review pending",
+    "release_notes": "Original user-supplied document preserved with BioSkillsHub format wrapper",
+    "source_file": "ml-chemical-reaction-prediction-workflow.md",
+    "source_sha256": "a559290eadc17b04a8494442074a91b7a0874a75d4925ef1036ab731b80f0254"
+  }
+]
