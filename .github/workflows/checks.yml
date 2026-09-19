@@ -33,3 +33,7 @@ jobs:
         env:
           APP_ORIGIN: http://localhost:3004
           REHEARSAL_DB_PORT: '5432'
+      - run: npm run test:load
+        env:
+          APP_ORIGIN: http://localhost:3004
+          REHEARSAL_DB_PORT: '5432'

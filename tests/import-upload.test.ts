@@ -31,3 +31,21 @@ test('rejects expansion bombs, excess entries, duplicates, encrypted files, syml
  assert.throws(()=>readImportUpload('key.pem',strToU8(source)));
  assert.throws(()=>readImportUpload('bad.java',new Uint8Array([0xff,0xfe])));
 });
+
+test('large multi-chunk Unicode ZIPs preserve source exactly and enforce byte boundaries',()=>{
+ const text=('class Example { /* μ漢字🧬 */ }\n').repeat(3000);
+ const archive=zip({'src/Workflow.java':strToU8(text),'notes/README.md':strToU8('Synthetic fixture instructions.')});
+ assert.equal(readImportUpload('large.zip',archive).files[0].content,text);
+ assert.throws(()=>readImportUpload('unicode.java',strToU8('🧬'.repeat(50001))),/200 KB/);
+ const files=Object.fromEntries(Array.from({length:100},(_,i)=>[`src/f${i}.custom`,strToU8('fixture')]));
+ assert.equal(readImportUpload('hundred.zip',zip(files)).files.length,100);
+});
+
+test('malformed archive mutations fail closed without filesystem extraction',()=>{
+ const valid=zip({'Main.java':strToU8(source)});
+ const central=valid.findIndex((_,i)=>valid[i]===0x50&&valid[i+1]===0x4b&&valid[i+2]===1&&valid[i+3]===2);
+ for(const offset of [0,8,30,central+10,central+16,central+42,valid.length-6]){
+  const altered=valid.slice();altered[offset]^=0x7f;assert.throws(()=>readImportUpload('mutated.zip',altered),`offset ${offset}`);
+ }
+ for(const length of [0,1,10,21,40,valid.length-1])assert.throws(()=>readImportUpload('truncated.zip',valid.slice(0,length)));
+});

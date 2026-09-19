@@ -95,3 +95,7 @@ Typecheck, build, PostgreSQL tests, sixteen Python tests and desktop/mobile brow
 ### Landing navigation and complete authoring verification
 
 `/` and `/about` now render the same project landing page even for signed-in users. The authenticated app is at `/workspace`, the brand links home, signed-out workspace visits return to the sign-in panel, and GitHub callbacks open the workspace. No OAuth callback registration change is required. Direct Markdown upload accepts `.md`/`.MD`, reports encoding problems, and explicitly explains that no AI key is needed. Browser coverage now includes each creator path: guided template, guided AI, conversation, single Java import, ZIP import, and large direct Markdown upload/edit/save/review/publication without AI. Model responses remain fixtures; live provider availability is not implied.
+
+## Functional and bounded-load audit
+
+Completed the isolated audit described in [the QA report](qa/overnight-audit.md), with recoverable [checkpoints](qa/overnight-checkpoint.md). Fixed non-object JSON returning server errors and unexpected trailing skill-route segments invoking valid operations. Fourteen Node/PostgreSQL checks, sixteen Python tests, typecheck, production build, extended desktop/mobile flows, 335 measured local HTTP requests, restart persistence and synthetic backup/restore passed. Bounded load now runs in CI. Live public deployment, real OAuth/provider access and scientific validation remain separate gates; no production writes or paid calls were made.

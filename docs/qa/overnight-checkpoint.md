@@ -1,22 +1,27 @@
 # Overnight audit checkpoint
 
-Status: active in the existing remote session; no Codex Cloud task exists. Laptop-disconnect survival is unverified.
+Status: local audit complete; awaiting final PR CI and integration. No Codex Cloud task was created.
+Checkpoint UTC: 2026-09-19T19:17:30.988625+00:00
 Branch: `codex/wojtek-overnight-audit`, based on merged PR #13 / `6235665`.
 
 ## Completed
-- Read repository operating instructions and reviewed API, authentication, catalogue, AI, import and database code.
-- Baseline TypeScript, five Node/PostgreSQL suites and sixteen Python tests passed immediately before this audit.
-- Preserved the untracked CLI diagnostic log privately in ignored `.local/diagnostics` without displaying its contents.
+- Reproduced and fixed non-object JSON producing server errors and extra path segments reaching skill operations. First tested fix checkpoint pushed as `5f9d35d`.
+- TypeScript, production build, all 14 Node/PostgreSQL checks and sixteen Python tests passed.
+- Extended Chromium desktop/mobile rehearsal passed every authoring path, negative Markdown cases/retry, restore/version readback, session expiry, key transport and agent-token handling.
+- 335 measured synthetic HTTP requests at concurrency 1/5/10 passed, including expected conflicts, validation errors and quotas. Integrity and process-restart persistence passed.
+- ZIP multi-chunk Unicode, 100-file boundary, corrupt/malformed/truncated archives and size checks passed.
+- Schema reapplication and synthetic-only backup/restore passed with existing PostgreSQL 17 binaries; eleven tables and immutability trigger verified.
+- Coverage, exact load results, defects/fixes and deployment limitations are in `docs/qa/overnight-audit.md`.
 
-## Current phase
-API regressions reproduced and fixed: non-object JSON previously returned HTTP 500; trailing skill-route segments could read/write valid endpoints. Requests now require a UTF-8 JSON object and exact route lengths. All 11 Node/PostgreSQL checks and TypeScript pass. Concurrency publication/acquisition/restore, quota atomicity and session expiry passed. Production data and external paid providers are excluded.
+## Evidence (ignored, synthetic/private)
+- `.local/rehearsal/rehearsal_1789845313365/result.json`
+- `.local/qa/load_1e8e0a6eb77b4e418bf3ff56a915de12/results.json`
+- `.local/recovery/bsh_restore_a6cdb9a603964534be6da0cd6a93154a/verification.json`
+- Recovery wrapper: `.local/qa/recovery-audit.mjs` (creates and drops its own source database).
 
-Checkpoint UTC: 2026-09-19T19:10:19.502653+00:00
+## Next actions / resume
+1. Inspect Git status and current PR CI; do not restart completed phases without new failures or changes.
+2. Merge only after required checks pass. Wojtek already authorized merging without teammate review.
+3. Hand off integration deployment and live OAuth/provider smoke testing. No migration is needed. No production data, live provider calls or scientific execution took place.
 
-## Next actions
-1. Expand archive and provider edge-case coverage; inspect UI behavior.
-2. Perform production-build desktop/mobile and bounded HTTP load checks.
-3. Check recovery, update the coverage report and push tested checkpoint commits/PR.
-
-## Resume
-Read this file, `docs/status.md`, and Git status before acting. Keep existing changes. Use Wojtek's local database only with disposable schemas. The existing browser rehearsal refuses occupied app ports and cleans up its synthetic data. No real provider or OAuth credentials are required for fixture tests. Never print `.env` or `.local` diagnostic contents.
+The workload finished without requiring an overnight loop. If interrupted before integration, the pushed branch/checkpoint preserves findings and resume instructions. Private credentials and diagnostics must never be printed or committed.
