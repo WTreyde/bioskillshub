@@ -37,18 +37,33 @@ try {
  browser=await chromium.launch({headless:true});
  let page=await browser.newPage({viewport:{width:1440,height:1000},recordVideo:{dir:evidence,size:{width:1440,height:1000}}});
  const errors=[];page.on('pageerror',e=>errors.push(e.name));
- async function login(id){await page.goto(origin);await page.getByLabel('Team account').selectOption(id);await page.getByLabel('Password',{exact:true}).fill(passwords[id]);await page.getByRole('button',{name:'Enter workspace'}).click();await page.getByRole('button',{name:'Creator studio',exact:true}).waitFor();}
+ async function login(id){const response=await page.request.post(origin+'/api/auth/login',{headers:{Origin:origin},data:{id,password:passwords[id]}});assert.equal(response.ok(),true,'Synthetic account session');await page.goto(origin);await page.getByRole('button',{name:'Creator studio',exact:true}).waitFor();}
+ await page.goto(origin);await page.getByRole('heading',{name:/Turn experience/}).waitFor();
+ assert.equal(await page.getByLabel('Password',{exact:true}).count(),0,'No password login form');
+ await page.getByText('GitHub sign-in is temporarily unavailable.',{exact:false}).waitFor();
+ await page.screenshot({path:evidence+'/landing-desktop.png',fullPage:true});
+ await page.setViewportSize({width:390,height:844});
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true,'Landing fits mobile');
+ await page.screenshot({path:evidence+'/landing-mobile.png',fullPage:true});
+ await page.goto(origin+'/about');await page.getByRole('heading',{name:/A method you can inspect/}).waitFor();
+ await page.setViewportSize({width:1440,height:1000});
  await page.goto(origin+'/browse');await page.getByRole('heading',{name:/Expertise/}).waitFor();
- await login('wojtek');pass('public browse and browser sign-in');
+ await page.getByRole('link',{name:'Physics (0)',exact:true}).click();await page.getByRole('heading',{name:'No skills here yet.'}).waitFor();
+ await login('wojtek');pass('public landing, empty domain and synthetic account session');
  await page.setViewportSize({width:390,height:844});
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true,'No narrow-screen overflow');
  assert.equal(await page.getByRole('button',{name:'Sign out',exact:true}).isVisible(),true,'Mobile sign-out reachable');
  await page.setViewportSize({width:1440,height:1000});
  await page.getByRole('button',{name:'Creator studio',exact:true}).click();
  const title='Synthetic rehearsal protocol';
+ pass('creator studio opened');
+
+ await page.getByLabel('Domain',{exact:true}).selectOption({label:'Physics'});
+ pass('new domain selected');
  await page.getByLabel('Skill title',{exact:true}).fill(title);
  await page.getByLabel('Short description').fill('A harmless synthetic fixture for the marketplace rehearsal; no scientific results.');
  for(const label of ['Use cases','Inputs','Outputs','Procedure','Expert decisions','Limitations','Examples']) await page.getByLabel(label,{exact:true}).fill(`Synthetic rehearsal ${label.toLowerCase()}; no scientific validation claimed.`);
+ pass('guided answers completed');
  await page.getByRole('button',{name:'Use structured template',exact:true}).click();
  await page.getByLabel('Skill instructions').waitFor();
  const content=await page.getByLabel('Skill instructions').inputValue();
@@ -89,6 +104,9 @@ try {
  await page.setViewportSize({width:1440,height:1000});
  await page.goto(origin+'/browse');await page.getByRole('heading',{name:title,exact:true}).waitFor();
  assert.equal(await page.locator('body').textContent().then(t=>t.includes('## Procedure')),false,'Public page omits instructions');
+ assert.equal(await page.locator('[data-artwork-id]').count(),1,'Published skill has artwork');
+ await page.getByRole('link',{name:'Physics (1)',exact:true}).click();
+ await page.getByRole('heading',{name:title,exact:true}).waitFor();
  await page.screenshot({path:evidence+'/public-catalog.png',fullPage:true});
  await page.context().close(); // Stop fallback recording before any token is created.
  page=await browser.newPage({viewport:{width:1440,height:1000}});page.on('pageerror',e=>errors.push(e.name));page.setDefaultTimeout(15000);await login('efe');

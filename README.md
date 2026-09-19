@@ -1,6 +1,6 @@
 # BioSkillsHub
 
-Expert scientific workflows, available to research agents through a versioned, access-controlled catalogue. Browse published metadata at `/browse`; instruction downloads require sign-in and acquisition.
+Expert scientific workflows, available to research agents through a versioned, access-controlled catalogue. The public landing page at `/` and About page at `/about` explain the project. Browse published metadata and filter all 16 domains (including empty categories) at `/browse`; instruction downloads require sign-in and acquisition.
 
 ## Run locally
 
@@ -19,7 +19,7 @@ For the containerised app: `docker compose up -d --build`. Initialise a new data
 
 ## GitHub sign-in and upgrades
 
-Any GitHub account can join once an administrator creates an OAuth App and privately configures `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` and `GITHUB_ALLOW_SIGNUP=true`. Existing team password login remains available. See [OAuth activation and identity mapping](docs/github-sign-in.md). Live GitHub authorization is unverified until those credentials are configured and exercised.
+Any GitHub account can join once an administrator creates an OAuth App and privately configures `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` and `GITHUB_ALLOW_SIGNUP=true`. The public sign-in page offers GitHub only; existing team credentials and the legacy API are preserved for operational compatibility. See [OAuth activation and identity mapping](docs/github-sign-in.md). Live GitHub authorization is unverified until those credentials are configured and exercised.
 
 For an existing database, back up first, run `npm run db:migrate` to add the OAuth tables, and restart the app. This preserves accounts, credentials and releases.
 
