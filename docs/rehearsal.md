@@ -29,12 +29,14 @@ sudo -u integration git -C /home/integration/bioskillshub fetch origin
 sudo -u integration git -C /home/integration/bioskillshub switch main
 sudo -u integration git -C /home/integration/bioskillshub merge --ff-only origin/main
 sudo -u integration git -C /home/integration/bioskillshub rev-parse HEAD
-sudo docker compose --project-directory /home/integration/bioskillshub up -d --build app
+sudo docker compose --project-directory /home/integration/bioskillshub build app
+sudo docker compose --project-directory /home/integration/bioskillshub run --rm --no-deps app node --import tsx scripts/migrate.ts
+sudo docker compose --project-directory /home/integration/bioskillshub up -d app
 sudo docker compose --project-directory /home/integration/bioskillshub ps
 curl --fail --silent --show-error http://127.0.0.1:3000/api/auth/me
 ```
 
-Expected anonymous response: `{"user":null}`. Record the deployed commit and verify database health and browser sign-in. This release requires no database migration or reseeding. Preserve the existing `.env`, account passwords and database volume. Never run `down -v`. If startup fails, retain the backup and inspect logs privately; do not paste credentials or full environment output into tasks.
+Expected anonymous response: `{"user":null}`. Record the deployed commit and verify database health and browser sign-in. This release adds OAuth tables; the commands above apply the schema migration before restarting the app. No reseeding is required. Preserve the existing `.env`, account passwords and database volume. Never run `down -v`. If startup fails, retain the backup and inspect logs privately; do not paste credentials or full environment output into tasks.
 
 ## Browser rehearsal — 3–4 minutes
 
@@ -58,4 +60,4 @@ Use the integration app only after its deployment is confirmed. Forward port 300
 
 The documented CPU rate is $0.32/hour including storage, not a fresh billing verification. The administrator must check actual Brev usage, start time, attached disks and any other workers, then update private `.local/costs.json`. No GPU worker is authorised by this rehearsal. Keep cumulative Brev spend within $100 unless explicitly increased; OpenAI has a separate $100 budget. Request quotas are not dollar caps.
 
-Sunday 20 September: collect evidence and a real fallback recording at 12:00 BST; freeze features and take a private database backup at 13:00 BST (12:00 UTC); judging begins at 15:00 BST. Confirm the CPU shutdown owner and time after the demo. Stop idle GPU workers immediately and verify disk billing. Shutdown and billing confirmation are manual pending administrator action; no automatic shutdown was scheduled here.
+Sunday 20 September: collect evidence and a real fallback recording at 12:00 BST; freeze features and take a private database backup at 13:00 BST (12:00 UTC); judging begins at 15:00 BST. The CPU stop target is Monday 21 September 12:00 BST (11:00 UTC); the administrator must register and verify the schedule described in [operations](operations.md). Stop idle GPU workers immediately and verify disk billing. Shutdown and billing confirmation are manual pending administrator action; no automatic shutdown was scheduled here.

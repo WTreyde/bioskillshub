@@ -7,3 +7,5 @@ Before running, domain owners freeze the reference dataset, allowed exclusions, 
 Copy run.example.json per run into a private results directory. Retain unsuccessful runs, stderr (after credential redaction), outputs, input/checkpoint/skill hashes and agent tool-call counts. Measure total wall time consistently, distinguish setup from inference, and document any human intervention. Run repeated paired trials when time permits; otherwise label the comparison exploratory and avoid generalised accuracy claims.
 
 Scientific owners must sign off the references and acceptance thresholds. The platform's seed validation labels remain pending until then.
+
+Use `compare.py BASELINE.json EXPERT.json --output PRIVATE_COMPARISON.json` to check paired settings and report recorded timing/metric differences while retaining failures. It does not establish significance or scientific validity. See [artifact intake](../../docs/scientific-intake.md).

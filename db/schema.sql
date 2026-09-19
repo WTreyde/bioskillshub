@@ -46,3 +46,11 @@ BEGIN RAISE EXCEPTION 'Published versions are immutable; publish a new version';
 $$ LANGUAGE plpgsql;
 DROP TRIGGER IF EXISTS immutable_versions ON versions;
 CREATE TRIGGER immutable_versions BEFORE UPDATE OR DELETE ON versions FOR EACH ROW EXECUTE FUNCTION immutable_version();
+
+CREATE TABLE IF NOT EXISTS github_identities (
+ github_id text PRIMARY KEY, user_id text NOT NULL UNIQUE REFERENCES users(id)
+);
+CREATE TABLE IF NOT EXISTS oauth_states (
+ state_hash text PRIMARY KEY, browser_hash text NOT NULL, verifier text NOT NULL,
+ expires_at timestamptz NOT NULL
+);

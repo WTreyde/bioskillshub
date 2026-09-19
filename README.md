@@ -1,6 +1,6 @@
 # BioSkillsHub
 
-Expert scientific workflows, available to research agents through a versioned, access-controlled catalogue.
+Expert scientific workflows, available to research agents through a versioned, access-controlled catalogue. Browse published metadata at `/browse`; instruction downloads require sign-in and acquisition.
 
 ## Run locally
 
@@ -17,6 +17,12 @@ Setup is idempotent and does not replace existing passwords or published version
 
 For the containerised app: `docker compose up -d --build`. Initialise a new database from the host as above, or run `docker compose exec app node --import tsx scripts/setup.ts` and retrieve credentials privately from the app container. The app and database bind only to localhost. Access the remote app with SSH forwarding.
 
+## GitHub sign-in and upgrades
+
+Any GitHub account can join once an administrator creates an OAuth App and privately configures `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` and `GITHUB_ALLOW_SIGNUP=true`. Existing team password login remains available. See [OAuth activation and identity mapping](docs/github-sign-in.md). Live GitHub authorization is unverified until those credentials are configured and exercised.
+
+For an existing database, back up first, run `npm run db:migrate` to add the OAuth tables, and restart the app. This preserves accounts, credentials and releases.
+
 ## LLM features
 
 Set server-only `OPENAI_API_KEY` and a mentor-confirmed `OPENAI_MODEL`; restart the app. Uses the Responses API, `store:false`, no tool execution and bounded output. Without configuration, recommendations explicitly use keyword matching, while guided forms can create a labelled structured template. No paid calls are made by setup or tests. `ai_usage` records token counts, not prompts. The global 40-request/day default and 10 requests/user/hour reduce accidental usage; additionally enforce the $100 budget through the OpenAI project billing controls and monitor actual cost.
@@ -30,7 +36,7 @@ python3 scripts/agent_client.py list
 python3 scripts/agent_client.py get imagej-foci 1 --output results/imagej/SKILL.md
 ```
 
-The helper verifies the response SHA-256 and saves a provenance manifest. Access expires after seven days or immediate revocation. Agents cannot acquire skills through these endpoints. The user controlling the agent can inspect downloaded instructions.
+The helper verifies the requested identity/version and response SHA-256, then saves private content and provenance files. Choose a fresh output path; existing downloads are never overwritten. Access expires after seven days or immediate revocation. Agents cannot acquire skills through these endpoints. The user controlling the agent can inspect downloaded instructions.
 
 ## Tests and team docs
 
@@ -46,6 +52,9 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 - [Implementation status and external gates](docs/status.md)
 - [Efe](docs/team/efe.md), [Leandre](docs/team/leandre.md), [Maxim](docs/team/maxim.md), [Wojtek](docs/team/wojtek.md)
 - [Pitch and rehearsal](docs/pitch.md)
+- [Readiness ledger and remaining gates](docs/readiness.md)
+- [Recovery, access and shutdown](docs/operations.md)
+- [Scientific artifact intake](docs/scientific-intake.md)
 - [Scientific evaluation contract](science/evaluation/README.md)
 
 ImageJ statistical utilities are runnable; real scientific validation requires Leandre's reference data. ADMET preflight deliberately rejects the placeholder manifest until a usable endpoint checkpoint is documented. These are not validated scientific demonstrations yet.

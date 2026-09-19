@@ -7,3 +7,5 @@ Start with the problem and workflow story. Leave explicit evidence placeholders 
 After the storyline is stable, coordinate with Efe before editing UI. Focus on demo polish, legibility, difficult network conditions and the transition between marketplace and agent workspace. Capture a genuine recorded fallback of completed work, clearly labelled if played instead of a live run.
 
 Run rehearsal before Sunday 13:00 BST. Keep the main pitch concise and place technical details in backup slides. Prepare honest answers about competition with free BioNeMo skills, creator incentives, validation, updates and content copying.
+
+The existing slide deck is preserved. Evidence/Q&A notes are appended to [the pitch document](../pitch.md); private token-free synthetic rehearsal recordings are available in Wojtek’s `.local/rehearsal/`.
