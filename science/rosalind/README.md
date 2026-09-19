@@ -16,14 +16,14 @@ The three entries are FASTQ quality review (Genomics), protein structure inspect
 
 ## Import
 
-After deploying this revision, use the existing integration environment and an existing curator account. No migration, credentials, API calls or GPU job is required. Back up using the usual deployment procedure first.
+After deploying this revision, use the existing integration environment. The importer creates the catalogue profile `rosalind`, displayed as **Rosalind**, if missing. It issues no login credentials and preserves credentials for an existing matching account. The profile explicitly disclaims official OpenAI affiliation. No migration, API calls or GPU job is required. Back up using the usual deployment procedure first.
 
 ```sh
-docker compose exec app node --import tsx scripts/seed-rosalind.ts --owner wojtek
-docker compose exec app node --import tsx scripts/seed-rosalind.ts --owner wojtek --apply
+docker compose exec app node --import tsx scripts/seed-rosalind.ts
+docker compose exec app node --import tsx scripts/seed-rosalind.ts --apply
 ```
 
-For Wojtek's personal database, use `npm run db:seed-rosalind -- --owner wojtek` (dry run), then add `--apply`. The shared atomic importer creates only missing version-1 entries and skips exact matches. Conflicting releases or drafts abort the entire import; accounts, credentials, literature skills and existing content remain untouched.
+For Wojtek's personal database, use `npm run db:seed-rosalind --` (dry run), then add `--apply`. The shared atomic importer creates missing version-1 entries, transfers the three unchanged starter entries from their previous owner to Rosalind, and skips exact matches. Published version IDs/content, buyer entitlements and other skills are preserved. Conflicting releases, saved drafts, or account-name collisions abort the entire transaction, including profile creation. An existing account with ID `rosalind` must be named exactly Rosalind; a different account already named Rosalind needs explicit identity resolution before import. The old `--owner wojtek` command is no longer accepted; omit `--owner`.
 
 ## Verification still needed
 
