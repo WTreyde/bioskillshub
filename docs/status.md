@@ -45,3 +45,9 @@ Added optional request-scoped OpenAI keys, explicit billing/data consent, model 
 The administrator's later handoff confirms PR #4 deployment, live GitHub sign-in and backup verification. This supersedes earlier OAuth-registration/deployment gates above. The Monday 21 September 11:00 UTC stop is scheduled locally by the administrator and depends on that machine remaining available; billing and scientific evidence still require their respective owners.
 
 Validation for this change: typecheck, production build, PostgreSQL provider/access lifecycle, sixteen Python tests and Chromium desktop/mobile rehearsal passed. Browser checks cover selected-version downloads, the task guide, explicit personal-key transport, absence from browser storage and removal on refresh. No live provider call was made.
+
+## Conversational creation — 19 September 2026
+
+Creator studio now includes Chat with AI: describe a workflow, answer targeted questions, explicitly generate a skill preview, then transfer it to the editable review/save/publish flow. Missing evidence must remain labelled as missing. Conversations are bounded, temporary and never auto-published. The feature uses the same personal/hosted OpenAI settings and sanitized provider adapter. Deployment and a paid live-provider smoke test remain outstanding; no migration is required.
+
+Validation passed: TypeScript, production build, PostgreSQL conversation/access/provider lifecycle, all sixteen Python tests and Chromium desktop/mobile flows. Browser coverage includes follow-up questions, preserved input after failure, draft preview/download, transfer to the editor, review gating and private draft saving. Provider responses are fixtures; no live AI or scientific validation is implied.
