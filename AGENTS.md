@@ -4,7 +4,7 @@ Read README.md, docs/architecture.md and your docs/team/<name>.md before changin
 
 ## Product agreement
 - Hackathon: London AI × Bio Hack, 18–20 September 2026. Demo freeze Sunday 13:00 BST; judging starts 15:00 BST.
-- Next.js/TypeScript/PostgreSQL; team-only demo, four accounts, simulated purchases.
+- Next.js/TypeScript/PostgreSQL; hackathon demo, four seeded team accounts plus optional open GitHub registration, public catalogue metadata, simulated purchases.
 - Functional browse → create → review → publish → acquire → token retrieval. Published versions are immutable.
 - Skills are authorised downloads, not DRM. Never claim that an agent can read instructions while its controlling user cannot.
 - Ratings, subscriptions and collaborative authorship are labelled roadmap previews only.

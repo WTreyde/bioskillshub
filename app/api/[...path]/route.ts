@@ -6,6 +6,7 @@ import {HttpError,hash,secret,verifyPassword,requireUser,sessionUser,agentUser,c
 import {catalog,owned,saveDraft,publish,restore,acquire,retrieve} from '@/lib/catalog';
 import {fields,guidedSchema,scaffold,validateContent} from '@/lib/validation';
 import {generate} from '@/lib/ai';
+import {githubConfigured,githubStart,githubCallback} from '@/lib/github';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 const integer=z.number().int().positive();
@@ -16,13 +17,16 @@ async function handle(request:Request,ctx:{params:Promise<{path:string[]}>}) {
  const path=(await ctx.params).path;const route=path.join('/');const method=request.method;
  if(method==='POST'||method==='DELETE')checkOrigin(request);
  if(route==='health'&&method==='GET'){await query('SELECT 1');return json({ok:true});}
+ if(route==='auth/github'&&method==='GET')return await githubStart();
+ if(route==='auth/github/callback'&&method==='GET')return await githubCallback(request);
+ if(route==='public/catalog'&&method==='GET')return json({skills:await catalog('')});
  if(route==='auth/login'&&method==='POST'){
  const d=z.object({id:z.string().toLowerCase().max(80),password:z.string().min(1).max(200)}).parse(await body(request));await rateLimit(`login:${d.id}`,15,900);
  const [user]=await query('SELECT * FROM users WHERE id=$1',[d.id]);if(!user||!verifyPassword(d.password,user.password_hash))throw new HttpError(401,'Incorrect account or password.');
  const token=secret();await query("INSERT INTO sessions(token_hash,user_id,expires_at) VALUES($1,$2,now()+interval '12 hours')",[hash(token),user.id]);
  const response=json({user:{id:user.id,name:user.name,expertise:user.expertise}});response.cookies.set('bsh_session',token,{httpOnly:true,sameSite:'strict',secure:process.env.COOKIE_SECURE==='true',path:'/',maxAge:43200});return response;
  }
- if(route==='auth/me'&&method==='GET')return json({user:await sessionUser(request)});
+ if(route==='auth/me'&&method==='GET')return json({user:await sessionUser(request),githubEnabled:githubConfigured()});
  if(route==='auth/logout'&&method==='POST'){
  const raw=request.headers.get('cookie')?.split(';').map(x=>x.trim()).find(x=>x.startsWith('bsh_session='))?.slice(12);if(raw)await query('DELETE FROM sessions WHERE token_hash=$1',[hash(raw)]);const response=json({ok:true});response.cookies.set('bsh_session','',{path:'/',maxAge:0});return response;}
  if(path[0]==='agent'){

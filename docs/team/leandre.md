@@ -25,3 +25,5 @@ You own scientific validity of the microscopy demonstration. Your first task is 
 - Supply one clear before/after image and an evidence statement to Maxim. If there is no improvement, say so.
 
 The web creator form supports guided generation and Markdown upload. Generated wording is a draft for your review. The initial catalogue entry says validation is pending; update that status only after you have evidence.
+
+Artifact intake and paired-run comparison tooling are prepared: see [scientific intake](../scientific-intake.md). Owner-supplied methods, permissions, references and actual scientific sign-off are still required; the sample skill has not been relabelled validated.
