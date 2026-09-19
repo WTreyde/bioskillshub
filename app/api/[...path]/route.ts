@@ -6,6 +6,7 @@ import {HttpError,hash,secret,verifyPassword,requireUser,sessionUser,agentUser,c
 import {catalog,owned,saveDraft,publish,restore,acquire,retrieve} from '@/lib/catalog';
 import {fields,guidedSchema,scaffold,validateContent} from '@/lib/validation';
 import {generate,personalAI,platformAIConfigured} from '@/lib/ai';
+import {skillChat} from '@/lib/skill-chat';
 import {readFile} from 'node:fs/promises';
 import {githubConfigured,githubStart,githubCallback} from '@/lib/github';
 export const runtime='nodejs';
@@ -54,6 +55,7 @@ async function handle(request:Request,ctx:{params:Promise<{path:string[]}>}) {
  if(route==='tokens'&&method==='GET')return json({tokens:await query('SELECT id,name,created_at,expires_at,revoked_at FROM api_tokens WHERE user_id=$1 ORDER BY created_at DESC',[user.id])});
  if(route==='tokens'&&method==='POST'){const d=z.object({name:z.string().trim().min(1).max(80)}).parse(await body(request));await rateLimit(`token:${user.id}`,20,3600);const token=`bsh_${secret()}`;await query('INSERT INTO api_tokens(id,user_id,name,token_hash) VALUES($1,$2,$3,$4)',[randomUUID(),user.id,d.name,hash(token)]);return json({token},201);}
  if(path[0]==='tokens'&&path.length===2&&method==='DELETE'){await query('UPDATE api_tokens SET revoked_at=now() WHERE id=$1 AND user_id=$2',[path[1],user.id]);return json({ok:true});}
+ if(route==='skill-chat'&&method==='POST')return json(await skillChat(user.id,await body(request)));
  if(route==='recommend'&&method==='POST'){
  const raw=await body(request);const d=z.object({prompt:z.string().trim().min(5).max(2000)}).parse(raw);const personal=personalAI(raw.ai);const list=await catalog(user.id);
  const metadata=list.map(({id,title,summary,domain,validation})=>({id,title,summary,domain,validation}));
