@@ -9,7 +9,12 @@ def validate(manifest_path):
         if not isinstance(m.get(key),str) or not m[key].strip() or m[key].startswith('TODO'): raise ValueError('Missing verified field: '+key)
     if m.get('endpoint_finetuned') is not True: raise ValueError('General pretrained weights are not an ADMET endpoint predictor.')
     checkpoint=path.parent/m['checkpoint_path']
-    digest=hashlib.file_digest(checkpoint.open('rb'),'sha256').hexdigest()
+    # Stream large checkpoints and support the documented Python 3.10 runtime.
+    hasher=hashlib.sha256()
+    with checkpoint.open('rb') as stream:
+        for chunk in iter(lambda: stream.read(1024*1024),b''):
+            hasher.update(chunk)
+    digest=hasher.hexdigest()
     if digest!=m['checkpoint_sha256']: raise ValueError('Checkpoint hash does not match.')
     for key in ['reference_dataset','reference_expected_output']:
         if not (path.parent/m[key]).is_file(): raise ValueError('Reference artefact is missing: '+key)
