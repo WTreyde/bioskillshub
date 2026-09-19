@@ -1,3 +1,4 @@
+import {zipSync,strToU8} from 'fflate';
 import {chromium} from 'playwright';
 import pg from 'pg';
 import net from 'node:net';
@@ -5,7 +6,6 @@ import {randomBytes,scryptSync,createHash} from 'node:crypto';
 import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {spawn,execFileSync} from 'node:child_process';
 import assert from 'node:assert/strict';
-import {resolve} from 'node:path';
 const origin=process.env.APP_ORIGIN||'http://localhost:3004';
 function privateUrl(value){try{return new URL(value);}catch{throw Error('Invalid private database/origin configuration.');}}
 const appUrl=privateUrl(origin);
@@ -136,13 +136,14 @@ try {
  await writeFile(evidence+'/upload-fixture/SKILL.md','Describe this synthetic workflow.');await writeFile(evidence+'/upload-fixture/scripts/check.py',scriptText);await writeFile(evidence+'/upload-fixture/.env','FIXTURE_ONLY=excluded');
  let importRequests=0;
  await page.route('**/api/skill-import',async route=>{const body=route.request().postDataJSON();importRequests++;assert.equal(body.confirmed,true);assert.equal(body.ai.apiKey,dummyKey);assert.equal(body.files.length,2);assert.ok(body.files.some(f=>f.path==='upload-fixture/scripts/check.py'&&f.content===scriptText));assert.ok(!JSON.stringify(body.files).includes('FIXTURE_ONLY'));await route.fulfill({json:{message:'Review the original script before use.',draft:{title:'Imported synthetic workflow',summary:'A synthetic imported workflow for testing the review process.',domain:'Chemistry',content:content+'\n\n## Original supporting files\n\n'+scriptText}}});});
- await page.getByLabel('Choose skill files',{exact:true}).setInputFiles({name:'single.md',mimeType:'text/markdown',buffer:Buffer.from('Standalone skill fixture')});await page.getByRole('status').filter({hasText:'1 files selected locally'}).waitFor();
- await page.getByLabel('Choose skill folder',{exact:true}).setInputFiles(resolve(evidence+'/upload-fixture'));await page.getByRole('status').filter({hasText:'2 files selected locally'}).waitFor();assert.equal(importRequests,0);
+ await page.getByRole('note',{name:'How your API key is handled'}).waitFor();
+ await page.getByLabel('Choose a single file or ZIP folder',{exact:true}).setInputFiles({name:'Workflow.java',mimeType:'text/markdown',buffer:Buffer.from('Standalone skill fixture')});await page.getByRole('status').filter({hasText:'1 files selected locally'}).waitFor();
+ await page.getByLabel('Choose a single file or ZIP folder',{exact:true}).setInputFiles({name:'workflow.zip',mimeType:'application/zip',buffer:Buffer.from(zipSync({'upload-fixture/SKILL.md':strToU8('Describe this synthetic workflow.'),'upload-fixture/scripts/check.py':strToU8(scriptText),'upload-fixture/.env':strToU8('FIXTURE_ONLY=excluded')}))});await page.getByRole('status').filter({hasText:'2 files selected locally'}).waitFor();assert.equal(importRequests,0);
  assert.equal(await page.getByRole('button',{name:'Analyse files with AI',exact:true}).isDisabled(),true);await page.getByLabel('I reviewed these files', {exact:false}).check();await page.getByRole('button',{name:'Analyse files with AI',exact:true}).click();await page.getByRole('button',{name:'Use imported draft in editor',exact:true}).waitFor();assert.equal(importRequests,1);await page.getByRole('status').filter({hasText:'AI analysis returned'}).waitFor();
  await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true,'Importer fits mobile');await page.screenshot({path:evidence+'/file-import-mobile.png',fullPage:true});
  await page.getByRole('button',{name:'Use imported draft in editor',exact:true}).click();assert.ok((await page.getByLabel('Skill instructions').inputValue()).includes(scriptText));assert.equal(await page.getByRole('button',{name:'Publish reviewed version'}).isDisabled(),true);
  await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();assert.equal((await db.query('SELECT count(*) FROM versions')).rows[0].count,'1');
- await page.unroute('**/api/skill-import');await page.setViewportSize({width:1440,height:1000});pass('file and folder selection, excluded private file, explicit AI consent, source retention and review-gated import');await page.reload();await page.getByRole('button',{name:'AI settings',exact:true}).click();await page.getByText('No hosted AI is configured.',{exact:false}).waitFor();
+ await page.unroute('**/api/skill-import');await page.setViewportSize({width:1440,height:1000});pass('Java file and ZIP selection, excluded private file, explicit AI consent, source retention and review-gated import');await page.reload();await page.getByRole('button',{name:'AI settings',exact:true}).click();await page.getByText('No hosted AI is configured.',{exact:false}).waitFor();
  pass('personal key explicit request, no browser persistence, refresh clears key');
  await page.getByRole('button',{name:'Connect agent',exact:true}).click();
  await page.getByLabel('Workspace name').fill('Disposable rehearsal');

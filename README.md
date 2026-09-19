@@ -77,6 +77,6 @@ Three free workflow proposals cover FASTQ quality review, structure inspection a
 
 An Anthropic-owned entry provides an attributed guide to the released protein-binder campaign bundle. It links to a pinned source revision and does not launch the campaign. See [scope, provenance and import instructions](science/anthropic/README.md).
 
-Creator studio also supports **Import files with AI** for text skill files and folders containing scripts. Review the selected files before sending them, then review the converted draft before saving/publishing. Original sources remain embedded as text in the Markdown download. See [file import instructions and limits](docs/using-skills.md#import-files-or-a-folder-with-ai).
+Creator studio also supports **Import files with AI** for a single UTF-8 source file in any programming language, or a ZIP-compressed folder containing scripts (200 KB upload and expanded contents). Review the selected files before sending them, then review the converted draft before saving/publishing. Original sources remain embedded as text in the Markdown download. See [file import instructions and limits](docs/using-skills.md#import-files-or-a-folder-with-ai).
 
 The attached chemical reaction prediction workflow is available as a free contributor skill owned by Aleksy Kwiatkowski; [import instructions](science/aleksy/README.md) preserve the original attachment and existing credentials.
