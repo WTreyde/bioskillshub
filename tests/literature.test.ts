@@ -56,6 +56,21 @@ test('literature import is attributed, atomic, repeatable and preserves existing
   await assert.rejects(retrieve('curator',rosalind[0].id,1));await acquire('curator',rosalind[0].id);
   assert.equal((await retrieve('curator',rosalind[0].id,1)).content,rosalind[0].content);
   assert.equal((await query('SELECT title FROM drafts'))[0].title,'My protected in-progress draft');
+  const {loadAnthropic,seedAnthropic}=await import('../lib/anthropic');
+  const [anthropic]=await loadAnthropic();assert.ok(anthropic.content.includes(anthropic.source_revision));assert.equal(anthropic.price_cents,0);
+  assert.equal((await seedAnthropic())[0].status,'would-insert');
+  assert.equal((await query("SELECT id FROM users WHERE id='anthropic'")).length,0);
+  await query("INSERT INTO users VALUES('conflicting-anthropic','Anthropic','Existing identity','preserve')");
+  await assert.rejects(seedAnthropic(true),/another account/);
+  assert.equal((await query('SELECT id FROM skills WHERE id=$1',[anthropic.id])).length,0);
+  await query("DELETE FROM users WHERE id='conflicting-anthropic'");
+  assert.equal((await seedAnthropic(true))[0].status,'inserted');
+  const beforeAnthropic=await query("SELECT * FROM users WHERE id='anthropic'");
+  assert.equal((await seedAnthropic(true))[0].status,'existing');
+  assert.deepEqual(await query("SELECT * FROM users WHERE id='anthropic'"),beforeAnthropic);
+  const listed=(await catalog('')).find(s=>s.id===anthropic.id);assert.ok(listed);assert.equal(listed.author,'Anthropic');assert.equal(listed.owner_id,'anthropic');
+  await assert.rejects(retrieve('curator',anthropic.id,1));await acquire('curator',anthropic.id);
+  assert.equal((await retrieve('curator',anthropic.id,1)).content,anthropic.content);
   await assert.rejects(query('UPDATE versions SET content=$1 WHERE skill_id=$2',['tampered',entries[0].id]),/immutable/);
  }finally{await pool.end();await admin.query(`DROP SCHEMA ${schema} CASCADE`);await admin.end();}
 });
