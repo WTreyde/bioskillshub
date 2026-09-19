@@ -58,3 +58,7 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 - [Scientific evaluation contract](science/evaluation/README.md)
 
 ImageJ statistical utilities are runnable; real scientific validation requires Leandre's reference data. ADMET preflight deliberately rejects the placeholder manifest until a usable endpoint checkpoint is documented. These are not validated scientific demonstrations yet.
+
+## Using your library and optional AI
+
+See [the acquired-skill walkthrough](docs/using-skills.md). Each acquired version includes direct Markdown/provenance downloads, a copyable task prompt and optional terminal retrieval instructions. **AI settings** supports a personal OpenAI API key for explicit recommendations/draft generation; keys are request-scoped and not saved. API usage is billed separately from simulated skill purchases. Manual ChatGPT/local-agent handoff requires no API key in BioSkillsHub.

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Read-only client. Never prints authentication headers or environment values."""
-import argparse, hashlib, http.client, json, os, pathlib, sys, tempfile
+import argparse, getpass, hashlib, http.client, json, os, pathlib, sys, tempfile
 import urllib.error, urllib.parse, urllib.request
 
 MAX_RESPONSE_BYTES = 1024 * 1024
@@ -70,6 +70,8 @@ def save_download(data, skill_id, version, output):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--url', default=os.environ.get('BIOSKILLS_URL', 'http://localhost:3000'), help='BioSkillsHub website URL')
+    parser.add_argument('--prompt-token', action='store_true', help='Read the token privately in your terminal; do not put it in the command')
     commands = parser.add_subparsers(dest='action', required=True)
     commands.add_parser('list')
     get = commands.add_parser('get')
@@ -80,7 +82,12 @@ def main():
         if args.version < 1:
             raise RuntimeError('Version must be positive.')
         suffix += f'/{urllib.parse.quote(args.skill_id, safe="")}/versions/{args.version}'
-    data = fetch(os.environ.get('BIOSKILLS_URL', 'http://localhost:3000'), os.environ.get('BIOSKILLS_TOKEN'), suffix)
+    token = os.environ.get('BIOSKILLS_TOKEN')
+    if args.prompt_token:
+        if not sys.stdin.isatty():
+            raise RuntimeError('Use --prompt-token in an interactive terminal, or set BIOSKILLS_TOKEN privately in the environment.')
+        token = getpass.getpass('BioSkillsHub access token (hidden): ')
+    data = fetch(args.url, token, suffix)
     if args.action == 'list':
         if not isinstance(data.get('skills'), list):
             raise RuntimeError('Service returned an invalid skills list.')
