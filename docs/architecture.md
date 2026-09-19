@@ -52,6 +52,12 @@ GitHub identities are keyed by stable numeric provider ID, never email or mutabl
 
 ## Personal AI and acquired-skill handoff
 
-The client holds optional personal OpenAI credentials in tab memory only. Only recommend/generate requests include the `ai: {apiKey, model, confirmed: true}` object. The server validates consent and HTTPS/localhost, forwards credentials to the fixed Responses endpoint with redirects refused, and sanitizes provider errors. It records token/model usage under `personal:<task>`, never credentials or request text. Hosted credentials remain server-side; personal requests never fall back to them. Structured templates bypass AI entirely.
+The client holds optional personal OpenAI credentials in tab memory only. Only recommend/generate/skill-chat requests include the `ai: {apiKey, model, confirmed: true}` object. The server validates consent and HTTPS/localhost, forwards credentials to the fixed Responses endpoint with redirects refused, and sanitizes provider errors. It records token/model usage under `personal:<task>`, never credentials or request text. Hosted credentials remain server-side; personal requests never fall back to them. Structured templates bypass AI entirely.
 
 Entitled session version retrieval includes SHA-256 for direct download provenance. `GET /api/downloads/agent-client` is a public source-code attachment (text, not JSON); it does not expose purchased content. The helper accepts `--url` and interactive `--prompt-token` without putting secrets in command history. See [usage guide](using-skills.md).
+
+## Conversational skill builder
+
+`POST /api/skill-chat` takes `{messages: [{role: "user" | "assistant", content}], action: "interview" | "draft", ai?}` and returns `{message, draft}`. Interview responses must have a null draft; explicit draft requests must contain valid title/summary/domain and Markdown with every required section. Authentication, same-origin checks and the existing AI quotas apply. Client-supplied system roles, invalid ordering, oversized transcripts and malformed provider outputs are rejected. Neither transcript nor generated draft is persisted by this endpoint; explicit existing save/publish endpoints retain their ownership and review gates.
+
+The full bounded transcript is passed as untrusted input to a stateless Responses request with `store:false`, without provider conversation IDs or tools. This follows the [manual conversation-state approach](https://developers.openai.com/api/docs/guides/conversation-state). The browser holds the chat only while its editor is mounted. Personal credentials are sent separately and never embedded in model input. Usage is recorded as `skill-chat` or `personal:skill-chat`.

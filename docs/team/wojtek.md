@@ -32,3 +32,5 @@ Recovery, open GitHub registration/public browsing, client reliability and scien
 ## Personal AI / usage handoff
 
 The `codex/wojtek-ai-handoff` change adds optional tab-memory OpenAI keys and explicit per-action calls, plus acquired-version downloads and detailed assistant/terminal instructions. No credentials were added or changed. The deployment administrator must deploy the merged revision to make these available on the demo URL; no migration is required. Live paid provider calls remain unverified. See [usage guide](../using-skills.md).
+
+The follow-up `codex/wojtek-chat-builder` adds conversational skill creation. Deploy latest merged main to include both the personal-key/usage change and this chat builder. No migration or new credentials are needed; provider verification still requires an explicitly configured live key.
