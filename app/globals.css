@@ -20,3 +20,4 @@
 @media(max-width:760px){.about-content{padding:25px 20px}.about-hero{padding:22px 0 38px}.about-hero h1{letter-spacing:-2px}.about-hero>p{font-size:16px}.about-steps{grid-template-columns:1fr;gap:15px;padding:24px}.about-intro{padding:30px 0}.public-header{height:auto;min-height:70px;flex-wrap:wrap;padding:16px 20px}.public-header nav{gap:18px}.public-site .login-form{margin:0 20px 35px;width:auto;padding:25px}.about-hero .actions a{white-space:normal}}
 .public-site a.outline{color:var(--green)}.public-site a.primary{color:white}
 .ai-info{background:#edf3fa;border:1px solid #cfdeeb;border-radius:8px;padding:16px;margin:18px 0;font-size:12px}.ai-info strong{display:block;margin-bottom:8px}.ai-info p{color:#425969}.ai-info p:last-child{margin-bottom:0}
+a.brand{color:var(--ink);text-decoration:none}

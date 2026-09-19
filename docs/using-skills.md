@@ -57,3 +57,9 @@ Without configured AI, the chat clearly explains how to connect a key; **Guided 
 Original selected text files are appended unchanged under **Original supporting files**, with their relative paths and safely delimited code blocks. The downloadable artefact remains a single Markdown skill, not a ZIP archive or installed environment. After reviewing it, a user or agent can extract the source text into the listed project files; no extraction is automatic. Saving/publishing includes these files in the skill, so check redistribution permission and remove anything inappropriate before saving. Missing dependencies, data or parameters must be resolved by the researcher.
 
 The information notice in AI settings and the importer explains that a personal OpenAI key passes through the BioSkillsHub server to OpenAI and is not stored by BioSkillsHub. Hosted AI uses the platform key instead; submitted text and files still go to OpenAI. Saved skills can contain up to 300 KB, allowing room for instructions and preserved source files.
+
+### Upload or edit Markdown without AI
+
+Open `/workspace` → Creator studio → Upload / edit Markdown. Select a UTF-8 `.md` or `.MD` file up to 300 KB, or type directly in the editor. Fill in the title and short description, complete the seven required sections, and save the draft. Review the final content and check the review box before publishing. This path does not need an API key and never sends content to OpenAI. The key-handling information notice belongs to AI settings and the AI importer; it is not a Markdown upload error.
+
+The home page and About page share the same project introduction. Click the workspace’s BioSkillsHub logo to return home and use Open workspace to return while signed in.
