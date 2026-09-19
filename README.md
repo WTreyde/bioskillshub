@@ -72,3 +72,7 @@ Four free, cited review checklists cover Imaging, Genomics, Chemistry and Struct
 ## Rosalind Workbench skills
 
 Three free workflow proposals cover FASTQ quality review, structure inspection and sequence alignment. See [manual handoff, verification limits and import instructions](science/rosalind/README.md). Workbench execution remains unverified; these entries do not establish an automatic integration or grant Workbench access.
+
+## Anthropic source collection
+
+An Anthropic-owned entry provides an attributed guide to the released protein-binder campaign bundle. It links to a pinned source revision and does not launch the campaign. See [scope, provenance and import instructions](science/anthropic/README.md).

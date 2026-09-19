@@ -40,3 +40,5 @@ The literature catalogue has an explicit dry-run/apply importer, using an existi
 For the Rosalind catalogue, deploy the merged revision and run the separate `scripts/seed-rosalind.ts` dry run/apply procedure in [the handoff](../../science/rosalind/README.md). This imports proposed instructions only; testing actual Workbench tools still needs an authorized user. The literature import remains independent.
 
 Ownership correction: after deploying this revision, run `scripts/seed-rosalind.ts` without `--owner wojtek`, first dry-run then `--apply`. It assigns unchanged Workbench starters to the Rosalind collection profile. See the updated handoff for identity conflicts; never rename or reset another account automatically.
+
+The Anthropic source entry uses its own `scripts/seed-anthropic.ts` dry-run/apply importer, with no owner argument. The owner is the `anthropic` attribution profile. Deploy then follow [the handoff](../../science/anthropic/README.md); do not run the upstream campaign or reset an existing account's credentials.

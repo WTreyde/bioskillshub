@@ -67,3 +67,9 @@ Typecheck, production build, PostgreSQL catalogue/access tests and all sixteen P
 ## Rosalind catalogue ownership
 
 The Workbench importer now creates/reuses the reserved `rosalind` profile (display name Rosalind) and atomically transfers only the three unchanged starter workflows to it. Existing credentials, published versions and acquisitions are preserved. The profile is a BioSkillsHub collection, not an official OpenAI identity. Conflicting account names, edited releases and saved drafts cause a full abort. Omit the old `--owner wojtek` argument. Required tests and production build pass, including catalogue authorship and preserved buyer access.
+
+## Anthropic source collection
+
+Added a free Anthropic-owned guide to the requested protein-binder prompt-release README, pinned to source revision d442eeb195e50e071f53e91ddb1ce046cf2a4249 with CC BY 4.0 attribution and explicit adaptation notes. This is a source-bundle guide, not a runnable campaign or a replicated scientific result. The atomic importer creates/reuses the attribution profile without changing existing credentials and preserves all existing content. See [import handoff](../science/anthropic/README.md). No source budgets, external messages or scientific computation are authorized by import.
+
+Typecheck, production build, PostgreSQL ownership/import/access tests and all sixteen Python tests passed. The entry is imported into Wojtek's database under Anthropic; a repeat dry run recognized the existing entry. The public integration import still requires the administrator. No upstream workflow, paid service or scientific computation was run.
