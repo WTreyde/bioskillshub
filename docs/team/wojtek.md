@@ -54,3 +54,7 @@ Deploy the merged landing/catalogue release from `origin/main`; no migration is 
 Deploy the merged importer release from `origin/main`, installing the updated lockfile before rebuilding. No schema change. Verify a Java file and a ZIP folder in Creator studio, the 200 KB instructions, local file previews, explicit sharing consent and the personal/hosted API-key information notices. Live model verification remains separate from fixture-based checks.
 
 The same release makes the landing page permanent at `/` and `/about`, with the app at `/workspace`. Verify brand-to-home navigation, signed-in Open workspace and GitHub callback routing. Direct Markdown creation works without AI credentials. All creator paths are included in the browser rehearsal; live AI remains a separate deployment check.
+
+### Audit handoff
+
+The audit fixes strict API body/route validation and adds concurrency, ZIP boundary, negative-browser and bounded HTTP regressions. See `docs/qa/overnight-audit.md` and its checkpoint. Deploy the merged audit release with the usual build/restart; no migration. Verify real public login and provider configuration separately.

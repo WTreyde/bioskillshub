@@ -22,6 +22,16 @@ test('adversarial requests and concurrent marketplace operations',async t=>{
  await t.test('malformed JSON values are client errors, not server failures',async()=>{
   for(const value of [null,[],true,42,'text'])for(const path of ['skills/missing/publish','skills/missing/acquire','skills/missing/restore','skill-import','skill-chat','recommend','generate'])assert.equal((await call(path,value)).status,400,`${path}: ${JSON.stringify(value)}`);
  });
+ await t.test('invalid encoding and chunked oversized JSON are rejected safely',async()=>{
+  async function raw(body:BodyInit,headers:Record<string,string>={}){const request=new Request('http://localhost:3004/api/skills',{method:'POST',headers:{origin:'http://localhost:3004','content-type':'application/json',cookie:'bsh_session=synthetic-owner',...headers},body,duplex:'half'} as RequestInit);return routes.POST(request,{params:Promise.resolve({path:['skills']})});}
+  assert.equal((await raw(new Uint8Array([123,34,120,34,58,34,255,34,125]))).status,400);
+  assert.equal((await raw('{broken')).status,400);
+  assert.equal((await raw('{}',{'content-type':'text/plain'})).status,415);
+  assert.equal((await raw('{}',{origin:'https://untrusted.example'})).status,403);
+  const chunk=new Uint8Array(500000).fill(32);let cancelled=false;
+  const stream=new ReadableStream({pull(controller){controller.enqueue(chunk);},cancel(){cancelled=true;}});
+  assert.equal((await raw(stream)).status,413);assert.equal(cancelled,true);
+ });
  await t.test('unexpected trailing path segments cannot read or mutate a skill',async()=>{
   const {data:{id}}=await call('skills',draft);
   for(const [action,body] of [['draft',draft],['publish',{reviewed:true}],['acquire',{confirm:true}],['restore',{number:1}]] as const)assert.equal((await call(`skills/${id}/${action}/unexpected`,body)).status,404,action);
