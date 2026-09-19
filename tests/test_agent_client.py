@@ -54,3 +54,14 @@ class AgentClientTests(unittest.TestCase):
             with patch.object(client.urllib.request,'build_opener') as opener:
                 opener.return_value.open.return_value.__enter__.return_value.read.return_value=body
                 with self.assertRaises(RuntimeError):client.fetch('http://localhost','token','/api/agent/skills')
+
+    def test_hidden_prompt_and_explicit_url(self):
+        with patch.object(client.sys,'argv',['agent_client.py','--url','https://demo.example','--prompt-token','list']), patch.object(client.sys.stdin,'isatty',return_value=True), patch.object(client.getpass,'getpass',return_value='fixture-token') as prompt, patch.object(client,'fetch',return_value={'skills':[]}) as fetch, patch('builtins.print'):
+            client.main()
+            prompt.assert_called_once()
+            fetch.assert_called_once_with('https://demo.example','fixture-token','/api/agent/skills')
+
+    def test_prompt_refuses_noninteractive_input(self):
+        with patch.object(client.sys,'argv',['agent_client.py','--prompt-token','list']), patch.object(client.sys.stdin,'isatty',return_value=False), patch.object(client,'fetch') as fetch:
+            with self.assertRaisesRegex(RuntimeError,'interactive terminal'):client.main()
+            fetch.assert_not_called()

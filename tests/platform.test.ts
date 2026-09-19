@@ -68,6 +68,28 @@ test('complete marketplace and agent access lifecycle against PostgreSQL',async(
  globalThis.fetch=async()=>new Response('provider failed',{status:500});assert.equal((await call('recommend','POST',{prompt:'fluorescence workflow'},b)).status,502);
  globalThis.fetch=async()=>new Response(JSON.stringify({status:'completed',output:[{content:[{type:'output_text',text:'not JSON'}]}]}));assert.equal((await call('recommend','POST',{prompt:'fluorescence workflow'},b)).status,502);
  } finally {globalThis.fetch=originalFetch;process.env.OPENAI_API_KEY='';}
+ const personal={apiKey:'sk-fixture-only-never-real-12345',model:'fixture-model',confirmed:true};
+ let calls=0;
+ try {
+ globalThis.fetch=async(url,options)=>{calls++;assert.equal(String(url),'https://api.openai.com/v1/responses');assert.equal(new Headers(options?.headers).get('Authorization'),`Bearer ${personal.apiKey}`);assert.ok(!String(options?.body).includes(personal.apiKey));assert.equal(JSON.parse(String(options?.body)).store,false);return Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify({recommendations:[{id,reason:'Fixture recommendation'}]})}]}]});};
+ assert.equal((await call('recommend','POST',{prompt:'fluorescence workflow',ai:personal},b)).status,200);
+ assert.equal(calls,1);
+ assert.equal((await call('recommend','POST',{prompt:'fluorescence workflow',ai:{...personal,confirmed:false}},b)).status,400);
+ assert.equal((await call('recommend','POST',{prompt:'fluorescence workflow',ai:personal})).status,401);
+ assert.equal((await call('recommend','POST',{prompt:'fluorescence workflow',ai:personal},b,undefined,'https://evil.example')).status,403);
+ assert.equal(calls,1,'Invalid or unauthenticated input must not reach provider');
+ assert.equal((await call('recommend','POST',{prompt:'fluorescence workflow'},o)).data.mode,'keyword','Personal key cannot leak to another account');
+ assert.ok(!JSON.stringify(await query('SELECT * FROM ai_usage')).includes(personal.apiKey));
+ assert.ok((await query("SELECT * FROM ai_usage WHERE task LIKE 'personal:%'")).length===1);
+ const answers=Object.fromEntries(['Use cases','Inputs','Outputs','Procedure','Expert decisions','Limitations','Examples'].map(section=>[section,'Synthetic fixture only.']));
+ const beforeTemplate=calls;assert.equal((await call('generate','POST',{title:'Fixture draft',answers,mode:'template',ai:personal},c)).data.mode,'template');assert.equal(calls,beforeTemplate);
+ globalThis.fetch=async(_url,options)=>{assert.equal(new Headers(options?.headers).get('Authorization'),`Bearer ${personal.apiKey}`);assert.ok(!String(options?.body).includes(personal.apiKey));return Response.json({output:[{content:[{type:'output_text',text:content}]}]});};
+ const generated=await call('generate','POST',{title:'Fixture draft',answers,ai:personal},c);assert.equal(generated.status,200);assert.equal(generated.data.content,content);
+ const helper=await routes.GET(new Request('http://localhost:3000/api/downloads/agent-client'),{params:Promise.resolve({path:['downloads','agent-client']})});assert.equal(helper.status,200);assert.equal(await helper.text(),await readFile('scripts/agent_client.py','utf8'));
+ globalThis.fetch=async()=>new Response(personal.apiKey,{status:401});
+ const rejected=await call('recommend','POST',{prompt:'fluorescence workflow',ai:personal},b);assert.equal(rejected.status,400);assert.ok(!JSON.stringify(rejected.data).includes(personal.apiKey));
+ assert.equal((await call(`skills/${id}/versions/1`,'GET',undefined,b)).data.sha256,hash(content));
+ } finally {globalThis.fetch=originalFetch;}
  const ts=await call('tokens','GET',undefined,b);assert.ok(!JSON.stringify(ts.data).includes(bt));assert.ok(!JSON.stringify(ts.data).includes(hash(bt)));
  await call(`tokens/${ts.data.tokens[0].id}`,'DELETE',undefined,o);assert.equal((await call('agent/skills','GET',undefined,undefined,bt)).status,200,'Other accounts cannot revoke tokens');
  await call(`tokens/${ts.data.tokens[0].id}`,'DELETE',undefined,b);assert.equal((await call('agent/skills','GET',undefined,undefined,bt)).status,401);

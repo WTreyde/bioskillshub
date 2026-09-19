@@ -28,3 +28,7 @@ Run npm test against the isolated test schema before integration. Test real prov
 The complete synthetic browser-to-Python flow passed in a disposable schema; see [status](../status.md#demo-rehearsal--19-september-2026). The [administrator handoff](../rehearsal.md) contains integration backup/deploy steps, the live demo sequence and remaining scientific/provider/spend gates. The local machine can perform deployment through the original Brev administrator connection; the personal Wojtek login cannot manage Docker. No other person's checkout or credentials were modified.
 
 Recovery, open GitHub registration/public browsing, client reliability and scientific-intake readiness work is tracked in [the readiness ledger](../readiness.md). The CPU stop deadline is Monday 21 September 12:00 BST; scheduling requires the local administrator and is not claimed complete.
+
+## Personal AI / usage handoff
+
+The `codex/wojtek-ai-handoff` change adds optional tab-memory OpenAI keys and explicit per-action calls, plus acquired-version downloads and detailed assistant/terminal instructions. No credentials were added or changed. The deployment administrator must deploy the merged revision to make these available on the demo URL; no migration is required. Live paid provider calls remain unverified. See [usage guide](../using-skills.md).

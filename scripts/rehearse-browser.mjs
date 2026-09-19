@@ -77,6 +77,10 @@ try {
  await page.getByRole('button',{name:'Confirm demo acquisition'}).click();
  await page.getByRole('button',{name:'Read selected version'}).click();
  await page.locator('.skill-content').waitFor();assert.equal(await page.locator('.skill-content').textContent(),content);
+ const downloadReady=page.waitForEvent('download');await page.getByRole('button',{name:'Download selected skill',exact:true}).click();const download=await downloadReady;assert.equal(await readFile(await download.path(),'utf8'),content);
+ await page.getByRole('heading',{name:'How to use this skill'}).waitFor();
+ assert.ok((await page.getByLabel('Suggested task prompt').inputValue()).includes(skill));
+ assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true,'Usage guide fits mobile');
  await page.screenshot({path:evidence+'/acquired-mobile.png',fullPage:true});
  await page.getByRole('button',{name:'Close details'}).click();
  await page.getByRole('button',{name:/^My library/}).click();await page.getByRole('button',{name:new RegExp(title)}).waitFor();
@@ -87,6 +91,16 @@ try {
  await page.screenshot({path:evidence+'/public-catalog.png',fullPage:true});
  await page.context().close(); // Stop fallback recording before any token is created.
  page=await browser.newPage({viewport:{width:1440,height:1000}});page.on('pageerror',e=>errors.push(e.name));await login('efe');
+ await page.getByRole('button',{name:'AI settings',exact:true}).click();
+ const dummyKey='sk-browser-fixture-not-a-real-key';
+ await page.getByLabel('OpenAI API key',{exact:true}).fill(dummyKey);await page.getByRole('checkbox').check();await page.getByRole('button',{name:'Enable personal key',exact:true}).click();
+ assert.equal(await page.getByLabel('OpenAI API key',{exact:true}).inputValue(),'');
+ assert.equal(await page.evaluate(key=>JSON.stringify({...localStorage,...sessionStorage}).includes(key),dummyKey),false);
+ let personalSent=false;
+ await page.route('**/api/recommend',async route=>{const body=route.request().postDataJSON();assert.equal(body.ai.apiKey,dummyKey);personalSent=true;await route.fulfill({json:{recommendations:[],note:'Fixture response'}});});
+ await page.getByRole('button',{name:'Explore',exact:true}).click();await page.getByLabel('Research question').fill('Synthetic workflow');await page.getByRole('button',{name:'Find skills',exact:true}).click();await page.getByText('Fixture response',{exact:true}).waitFor();assert.equal(personalSent,true);
+ await page.unroute('**/api/recommend');await page.reload();await page.getByRole('button',{name:'AI settings',exact:true}).click();await page.getByText('No hosted AI is configured.',{exact:false}).waitFor();
+ pass('personal key explicit request, no browser persistence, refresh clears key');
  await page.getByRole('button',{name:'Connect agent',exact:true}).click();
  await page.getByLabel('Workspace name').fill('Disposable rehearsal');
  await page.getByRole('button',{name:'Create token',exact:true}).click();
