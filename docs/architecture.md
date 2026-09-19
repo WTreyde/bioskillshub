@@ -49,3 +49,9 @@ Tokens use 256-bit random values and SHA-256 hashes. Passwords use salted scrypt
 Keep this HTTP contract stable. Ask the OpenAI mentor for the supported skill install/connector surface and model identifier. Run list → retrieve pinned version → execute a harmless fixture → record output provenance. Do not infer verified Rosalind compatibility from Codex success alone.
 
 GitHub identities are keyed by stable numeric provider ID, never email or mutable login. `oauth_states` contains ten-minute, browser-bound authorization attempts. GitHub tokens are not persisted. See [OAuth activation](github-sign-in.md); live provider verification remains pending.
+
+## Personal AI and acquired-skill handoff
+
+The client holds optional personal OpenAI credentials in tab memory only. Only recommend/generate requests include the `ai: {apiKey, model, confirmed: true}` object. The server validates consent and HTTPS/localhost, forwards credentials to the fixed Responses endpoint with redirects refused, and sanitizes provider errors. It records token/model usage under `personal:<task>`, never credentials or request text. Hosted credentials remain server-side; personal requests never fall back to them. Structured templates bypass AI entirely.
+
+Entitled session version retrieval includes SHA-256 for direct download provenance. `GET /api/downloads/agent-client` is a public source-code attachment (text, not JSON); it does not expose purchased content. The helper accepts `--url` and interactive `--prompt-token` without putting secrets in command history. See [usage guide](using-skills.md).
