@@ -12,4 +12,4 @@ export async function loadRosalind(){
   return {...entry,content};
  }));
 }
-export async function seedRosalind(owner:string,apply=false){return seedCatalog(owner,await loadRosalind(),apply);}
+export async function seedRosalind(apply=false){return seedCatalog('rosalind',await loadRosalind(),apply,{name:'Rosalind',expertise:'BioSkillsHub Workbench workflow collection · not an official OpenAI account',reassignMatching:true});}
