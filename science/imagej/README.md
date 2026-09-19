@@ -12,3 +12,5 @@ python3 science/imagej/summarize.py results/synthetic-output/synthetic_counts.cs
 ```
 
 Expected synthetic counts, sorted: 0, 2, 3. Fixture IDs are not independent biological replicates. Do not infer scientific accuracy from this smoke test. For real data, follow docs/team/leandre.md, provide a reviewed configuration, validate on held-out references and retain the actual Fiji version in the manifest. The summary utility intentionally does not run significance tests.
+
+Before real-data evaluation, complete `dataset.example.json` privately and run `python3 science/imagej/preflight.py PRIVATE_MANIFEST.json`. See [scientific intake](../../docs/scientific-intake.md).

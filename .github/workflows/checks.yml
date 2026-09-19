@@ -28,3 +28,8 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: python3 -m unittest discover -s tests -p 'test_*.py'
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+        env:
+          APP_ORIGIN: http://localhost:3004
+          REHEARSAL_DB_PORT: '5432'

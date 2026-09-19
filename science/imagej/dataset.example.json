@@ -1,0 +1,12 @@
+{
+  "reviewed_by": null,
+  "permission": null,
+  "biological_question": null,
+  "independent_replicate": null,
+  "protocol_path": null,
+  "protocol_sha256": null,
+  "frozen_metrics": null,
+  "images": [
+    {"image_id":"example","split":"held_out","replicate_id":null,"condition":null,"nuclei_path":null,"nuclei_sha256":null,"foci_path":null,"foci_sha256":null,"reference_counts_path":null,"reference_counts_sha256":null,"reference_mask_path":null,"reference_mask_sha256":null,"pixel_size_um":null,"bit_depth":null,"dimensions":"2D","channel_definition":null}
+  ]
+}
