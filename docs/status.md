@@ -10,7 +10,7 @@
 
 ## External gates — not complete
 
-- Brev provisioning: no instance created; available browser requires team sign-in. No Brev expenditure initiated.
+- Brev provisioning: `bioskillshub-cpu` requested on 19 September at 14:19 UTC; $0.32/hour including storage. Remote connection and deployment remain pending.
 - Rosalind: technical access unconfirmed; do not advertise a verified integration.
 - OpenAI API: project key/model not configured by this implementation; live model calls unverified.
 - ImageJ: Leandre's dataset, parameters, reference annotations and experimental design still required. Synthetic fixtures establish software behaviour only.
