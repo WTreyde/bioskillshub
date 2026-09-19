@@ -1,0 +1,7 @@
+#!/bin/sh
+# Smoke-test core ImageJ macro commands under a virtual display.
+# This is not a full Fiji distribution and does not provide Fiji plugins.
+set -eu
+[ "$1" = "--headless" ] && shift
+[ "$1" = "-macro" ] && shift
+exec xvfb-run -a java -jar /usr/share/java/ij.jar -batch "$@"

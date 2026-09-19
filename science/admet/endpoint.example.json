@@ -1,0 +1,16 @@
+{
+ "endpoint": "TODO mentor-confirmed endpoint",
+ "endpoint_definition": "TODO",
+ "output_units_or_classes": "TODO",
+ "endpoint_finetuned": false,
+ "checkpoint_path": "TODO",
+ "checkpoint_sha256": "TODO",
+ "checkpoint_source": "TODO",
+ "license": "TODO",
+ "preprocessing": "TODO training-time standardisation",
+ "feature_settings": "TODO exact inference flags",
+ "reference_dataset": "TODO labelled CSV path",
+ "reference_expected_output": "TODO known output path",
+ "bionemo_commit": "TODO",
+ "reviewed_by": "TODO Wojtek"
+}
