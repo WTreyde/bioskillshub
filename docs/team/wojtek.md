@@ -42,3 +42,5 @@ For the Rosalind catalogue, deploy the merged revision and run the separate `scr
 Ownership correction: after deploying this revision, run `scripts/seed-rosalind.ts` without `--owner wojtek`, first dry-run then `--apply`. It assigns unchanged Workbench starters to the Rosalind collection profile. See the updated handoff for identity conflicts; never rename or reset another account automatically.
 
 The Anthropic source entry uses its own `scripts/seed-anthropic.ts` dry-run/apply importer, with no owner argument. The owner is the `anthropic` attribution profile. Deploy then follow [the handoff](../../science/anthropic/README.md); do not run the upstream campaign or reset an existing account's credentials.
+
+For the attached contributor workflow, deploy this revision and run `scripts/seed-ak.ts`, first dry run, then `--apply`, with no owner argument. It creates/reuses ak without issuing or changing existing login credentials. The same release adds the AI file/folder importer; verify its UI without paid calls unless separately authorized. No migration is required.
