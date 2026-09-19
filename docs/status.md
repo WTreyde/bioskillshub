@@ -10,7 +10,7 @@
 
 ## External gates — not complete
 
-- Brev provisioning: `bioskillshub-cpu` requested on 19 September at 14:19 UTC; $0.32/hour including storage. Remote connection and deployment remain pending.
+- Brev: `bioskillshub-cpu` is running at $0.32/hour including storage. SSH, production deployment and remote agent smoke test passed. Separate team clones/databases are ready; individual SSH public keys and personal Codex authentication are pending.
 - Rosalind: technical access unconfirmed; do not advertise a verified integration.
 - OpenAI API: project key/model not configured by this implementation; live model calls unverified.
 - ImageJ: Leandre's dataset, parameters, reference annotations and experimental design still required. Synthetic fixtures establish software behaviour only.
