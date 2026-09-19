@@ -1,0 +1,7 @@
+'use client';
+import {useEffect,useState} from 'react';
+export function LandingAccess(){
+ const [access,setAccess]=useState<{user:unknown;githubEnabled:boolean}|null>(null),[error,setError]=useState('');
+ useEffect(()=>{let active=true;fetch('/api/auth/me').then(async r=>{if(!r.ok)throw Error();return r.json();}).then(value=>{if(active)setAccess(value);}).catch(()=>{if(active)setError('Sign-in status is temporarily unavailable. Reload to try again.');});if(new URLSearchParams(window.location.search).has('auth_error'))setError('GitHub sign-in failed or was cancelled. Please try again.');return()=>{active=false;};},[]);
+ return <section className="login-form" id="sign-in"><span className="pill">HACKATHON PREVIEW</span><h2>{access?.user?'Your workspace is ready.':'Welcome to the lab.'}</h2><p>Acquire, create and connect scientific skills.</p><div className="login-options">{access?.user?<a className="primary" href="/workspace">Open workspace</a>:access?.githubEnabled?<a className="primary" href="/api/auth/github">Continue with GitHub</a>:access?<p role="status">GitHub sign-in is temporarily unavailable. You can still browse the public catalogue.</p>:!error?<p role="status">Checking sign-in status…</p>:null}<a className="outline" href="/browse">Browse the public catalogue</a></div>{error&&<p role="alert" className="error">{error}</p>}<small>Sign in with your GitHub account to join. Purchases in this workspace are simulated.</small></section>;
+}

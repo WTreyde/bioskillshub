@@ -1,6 +1,6 @@
 # BioSkillsHub
 
-Expert scientific workflows, available to research agents through a versioned, access-controlled catalogue. The public landing page at `/` and About page at `/about` explain the project. Browse published metadata and filter all 16 domains (including empty categories) at `/browse`; instruction downloads require sign-in and acquisition.
+Expert scientific workflows, available to research agents through a versioned, access-controlled catalogue. The landing page at `/` and its `/about` alias explain the project for all visitors. The signed-in app lives at `/workspace`; clicking its BioSkillsHub logo returns home. Browse published metadata and filter all 16 domains (including empty categories) at `/browse`; instruction downloads require sign-in and acquisition.
 
 ## Run locally
 

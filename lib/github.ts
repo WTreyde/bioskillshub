@@ -51,7 +51,7 @@ export async function githubCallback(request:Request){
    }
    await db.query("INSERT INTO sessions(token_hash,user_id,expires_at) VALUES($1,$2,now()+interval '12 hours')",[hash(session),userId]);
   });
-  const response=clear(NextResponse.redirect(origin()+'/',303));
+  const response=clear(NextResponse.redirect(origin()+'/workspace',303));
   response.cookies.set('bsh_session',session,{httpOnly:true,sameSite:'strict',secure:process.env.COOKIE_SECURE==='true',path:'/',maxAge:43200});return response;
  }catch{
   // Do not log provider tokens, authorization codes, profiles or response bodies.
