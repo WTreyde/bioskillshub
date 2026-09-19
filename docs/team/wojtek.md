@@ -38,3 +38,5 @@ The follow-up `codex/wojtek-chat-builder` adds conversational skill creation. De
 The literature catalogue has an explicit dry-run/apply importer, using an existing curator account. After deploying the merged revision, the integration administrator should follow [the literature import handoff](../../science/literature/README.md). Do not run db:setup or reset credentials to import these entries.
 
 For the Rosalind catalogue, deploy the merged revision and run the separate `scripts/seed-rosalind.ts` dry run/apply procedure in [the handoff](../../science/rosalind/README.md). This imports proposed instructions only; testing actual Workbench tools still needs an authorized user. The literature import remains independent.
+
+Ownership correction: after deploying this revision, run `scripts/seed-rosalind.ts` without `--owner wojtek`, first dry-run then `--apply`. It assigns unchanged Workbench starters to the Rosalind collection profile. See the updated handoff for identity conflicts; never rename or reset another account automatically.
