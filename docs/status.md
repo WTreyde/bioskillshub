@@ -10,7 +10,7 @@
 
 ## External gates — not complete
 
-- Brev: `bioskillshub-cpu` is running at $0.32/hour including storage. SSH, production deployment and remote agent smoke test passed. Separate team clones/databases are ready; all four SSH public keys are installed; personal login verification and Codex authentication remain pending. See docs/team/ssh-access.md.
+- Brev: `bioskillshub-cpu` is running at $0.32/hour including storage. SSH, production deployment and remote agent smoke test passed. Separate team clones/databases are ready; all four SSH public keys are installed; Wojtek’s personal workspace and the integration app login are verified; each teammate must verify their own login. See docs/team/ssh-access.md.
 - Rosalind: technical access unconfirmed; do not advertise a verified integration.
 - OpenAI API: project key/model not configured by this implementation; live model calls unverified.
 - ImageJ: Leandre's dataset, parameters, reference annotations and experimental design still required. Synthetic fixtures establish software behaviour only.
@@ -31,3 +31,9 @@ PR #1 is merged into `main`; new work should branch from `origin/main`, not `cod
 - All required checks passed, including four Python tests. ADMET preflight now streams checkpoint hashes on Python 3.10; a synthetic checkpoint test covers successful provenance checking and tampering rejection. This does not supply or validate an ADMET predictor.
 - Shared integration HTTP health returned 200 on port 3000. Its deployed commit, authenticated browser flow and redeployment remain unverified because Wojtek's personal account lacks Docker/sudo access. An administrator must perform the [backup and deployment handoff](rehearsal.md).
 - Wojtek confirmed scientific reference artifacts and provider configuration are not yet available. No live provider calls or GPU workers were started. Actual billing totals and shutdown ownership still need administrator confirmation; the documented hourly rate alone does not establish total spend.
+
+## Readiness implementation — 19 September 2026
+
+See [the readiness ledger](readiness.md) for the complete implementation and external-action split. Added public metadata browsing, configurable open GitHub registration, keyboard/mobile improvements, reproducible token-free browser recording, recovery/access checks, hardened client downloads and scientific intake/comparison tooling. The existing slide deck is preserved, with supporting evidence/Q&A notes in the pitch document.
+
+Local checks passed: typecheck, production build, PostgreSQL access-control/mocked OAuth lifecycle, fourteen Python tests, full Chromium creator/buyer/helper flow with public browsing and keyboard/mobile checks, and restore verification of all eleven application tables. Scientific/provider evidence is still pending. GitHub OAuth requires App registration and private credentials for live verification. The requested Monday 12:00 BST CPU stop is prepared but not scheduled from this account. Previous integration deployment/sign-in was confirmed by the local task and Wojtek; this newer release requires migration and redeployment by that administrator.
