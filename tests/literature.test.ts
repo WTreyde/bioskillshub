@@ -31,10 +31,27 @@ test('literature import is attributed, atomic, repeatable and preserves existing
   const {loadRosalind,seedRosalind}=await import('../lib/rosalind');
   const rosalind=await loadRosalind();assert.equal(rosalind.length,3);
   for(const entry of rosalind){assert.equal(entry.price_cents,0);assert.match(entry.validation,/Workbench execution unverified/);assert.ok(entry.content.includes(entry.source_url));}
-  assert.ok((await seedRosalind('curator')).every(e=>e.status==='would-insert'));
+  assert.ok((await seedRosalind()).every(e=>e.status==='would-insert'));
   assert.equal((await query('SELECT * FROM versions')).length,4);
-  assert.ok((await seedRosalind('curator',true)).every(e=>e.status==='inserted'));
-  assert.ok((await seedRosalind('curator',true)).every(e=>e.status==='existing'));
+  assert.equal((await query("SELECT * FROM users WHERE id='rosalind'")).length,0,'Dry run does not create profile');
+  const {seedCatalog}=await import('../lib/seed-catalog');
+  await query("INSERT INTO users VALUES('other-rosalind','Rosalind','Existing user','preserved')");
+  await assert.rejects(seedRosalind(true),/another account/);
+  assert.equal((await query('SELECT * FROM versions')).length,4);
+  await query("DELETE FROM users WHERE id='other-rosalind'");
+  await seedCatalog('curator',rosalind,true); // Earlier deployments assigned these to the importing user.
+  await acquire('curator',rosalind[1].id);
+  const before=await query('SELECT * FROM versions ORDER BY id');
+  assert.ok((await seedRosalind()).every(e=>e.status==='would-reassign'));
+  assert.ok((await seedRosalind(true)).every(e=>e.status==='reassigned'));
+  assert.equal((await retrieve('curator',rosalind[1].id,1)).content,rosalind[1].content,'Existing buyer access survives transfer');
+  assert.deepEqual(await query('SELECT * FROM versions ORDER BY id'),before,'Ownership transfer preserves immutable releases');
+  assert.equal((await query("SELECT name FROM users WHERE id='rosalind'"))[0].name,'Rosalind');
+  assert.equal((await catalog('')).filter(s=>s.id.startsWith('rosalind-')).every(s=>s.author==='Rosalind'),true);
+  const profile=await query("SELECT * FROM users WHERE id='rosalind'");
+
+  assert.ok((await seedRosalind(true)).every(e=>e.status==='existing'));
+  assert.deepEqual(await query("SELECT * FROM users WHERE id='rosalind'"),profile,'Repeat import preserves profile credentials');
   assert.equal((await query('SELECT * FROM versions')).length,7);
   await assert.rejects(retrieve('curator',rosalind[0].id,1));await acquire('curator',rosalind[0].id);
   assert.equal((await retrieve('curator',rosalind[0].id,1)).content,rosalind[0].content);

@@ -63,3 +63,7 @@ Typecheck, production build, PostgreSQL importer/access tests and sixteen Python
 Added three free skills targeting documented Workbench NGS, structure-viewer and alignment-viewer capabilities, plus a manual handoff and separate importer. All retain Workbench execution unverified and scientific-validation-pending labels. The official documentation is now identified, but account access and actual execution are still untested. No connector, endpoint, tool invocation or scientific output is claimed verified. See [Rosalind handoff](../science/rosalind/README.md).
 
 Typecheck, production build, PostgreSQL catalogue/access tests and all sixteen Python tests passed. The three Workbench entries were imported into Wojtek's personal database; repeat dry runs recognized them and the four literature entries without changes. Public import remains an administrator action. No live Workbench or model execution took place.
+
+## Rosalind catalogue ownership
+
+The Workbench importer now creates/reuses the reserved `rosalind` profile (display name Rosalind) and atomically transfers only the three unchanged starter workflows to it. Existing credentials, published versions and acquisitions are preserved. The profile is a BioSkillsHub collection, not an official OpenAI identity. Conflicting account names, edited releases and saved drafts cause a full abort. Omit the old `--owner wojtek` argument. Required tests and production build pass, including catalogue authorship and preserved buyer access.
