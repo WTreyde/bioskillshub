@@ -57,3 +57,9 @@ Validation passed: TypeScript, production build, PostgreSQL conversation/access/
 Prepared four free, attributed literature checklists for Imaging, Genomics, Chemistry and Structural biology. Each includes scope, inputs, outputs, decisions, limitations, examples and a DOI citation; all explicitly remain expert-review pending and experimentally unvalidated. The transactional importer preserves accounts, credentials, existing releases, drafts and entitlements. See [source catalogue and import instructions](../science/literature/README.md). Public deployment/import requires the integration administrator; a personal database import does not update the website.
 
 Typecheck, production build, PostgreSQL importer/access tests and sixteen Python tests passed. All four entries were imported into Wojtek's personal database; a repeat dry run reported all four as existing. Integration database import remains pending. No credentials or teammate checkouts were modified, and no live model calls were made.
+
+## Rosalind workflow proposals — 19 September 2026
+
+Added three free skills targeting documented Workbench NGS, structure-viewer and alignment-viewer capabilities, plus a manual handoff and separate importer. All retain Workbench execution unverified and scientific-validation-pending labels. The official documentation is now identified, but account access and actual execution are still untested. No connector, endpoint, tool invocation or scientific output is claimed verified. See [Rosalind handoff](../science/rosalind/README.md).
+
+Typecheck, production build, PostgreSQL catalogue/access tests and all sixteen Python tests passed. The three Workbench entries were imported into Wojtek's personal database; repeat dry runs recognized them and the four literature entries without changes. Public import remains an administrator action. No live Workbench or model execution took place.

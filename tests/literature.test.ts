@@ -28,6 +28,17 @@ test('literature import is attributed, atomic, repeatable and preserves existing
   await saveDraft('curator',{...entries[0],title:'My protected in-progress draft'},entries[0].id);
   await assert.rejects(seedLiterature('curator',true),/conflicts/);assert.equal((await query('SELECT title FROM drafts'))[0].title,'My protected in-progress draft');
   assert.equal((await query('SELECT * FROM entitlements')).length,1);
+  const {loadRosalind,seedRosalind}=await import('../lib/rosalind');
+  const rosalind=await loadRosalind();assert.equal(rosalind.length,3);
+  for(const entry of rosalind){assert.equal(entry.price_cents,0);assert.match(entry.validation,/Workbench execution unverified/);assert.ok(entry.content.includes(entry.source_url));}
+  assert.ok((await seedRosalind('curator')).every(e=>e.status==='would-insert'));
+  assert.equal((await query('SELECT * FROM versions')).length,4);
+  assert.ok((await seedRosalind('curator',true)).every(e=>e.status==='inserted'));
+  assert.ok((await seedRosalind('curator',true)).every(e=>e.status==='existing'));
+  assert.equal((await query('SELECT * FROM versions')).length,7);
+  await assert.rejects(retrieve('curator',rosalind[0].id,1));await acquire('curator',rosalind[0].id);
+  assert.equal((await retrieve('curator',rosalind[0].id,1)).content,rosalind[0].content);
+  assert.equal((await query('SELECT title FROM drafts'))[0].title,'My protected in-progress draft');
   await assert.rejects(query('UPDATE versions SET content=$1 WHERE skill_id=$2',['tampered',entries[0].id]),/immutable/);
  }finally{await pool.end();await admin.query(`DROP SCHEMA ${schema} CASCADE`);await admin.end();}
 });
