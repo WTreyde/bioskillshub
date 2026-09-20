@@ -60,14 +60,18 @@ The information notice in AI settings and the importer explains that a personal 
 
 ### Upload or edit Markdown without AI
 
-Open `/workspace` → Creator studio → Upload / edit Markdown. Select a UTF-8 `.md` or `.MD` file up to 300 KB, or type directly in the editor. Fill in the title and short description, complete the seven required sections, and save the draft. Review the final content and check the review box before publishing. This path does not need an API key and never sends content to OpenAI. The key-handling information notice belongs to AI settings and the AI importer; it is not a Markdown upload error.
+Open `/workspace` → Creator studio → Upload / edit Markdown. Select a UTF-8 `.md` or `.MD` file up to 300 KB, or type directly in the editor. Fill in the title and short description, review the instructions in your own format, and save the draft. Review the final content and check the review box before publishing. This path does not need an API key and never sends content to OpenAI. The key-handling information notice belongs to AI settings and the AI importer; it is not a Markdown upload error.
 
 The home page and About page share the same project introduction. Click the workspace’s BioSkillsHub logo to return home and use Open workspace to return while signed in.
 
-## Upload an existing native SKILL.md without AI
+## Consistent authoring and optional structure
 
-In Creator studio, choose **New skill → Upload / edit Markdown** and select your `.md` file. Native skills with YAML `name` and `description` metadata followed by workflow instructions can keep their own headings; they do not need the seven BioSkillsHub template sections. We fill empty title/description fields from that metadata without changing the uploaded instructions. Existing editor metadata is preserved; review it when replacing a file.
+All four authoring methods keep their own selected interface. Guided authoring stays on its questions, Chat stays on its conversation, Import stays on its source files, and Markdown stays on its upload. Each has the same **Review and edit your draft** area below, followed by save, review and publish controls. Generating or applying a draft never switches you to Markdown upload.
 
-Check title, description, domain, price and validation status, save the draft, review the full instructions and then publish. No API key or conversion is required. Uploads support UTF-8 Markdown up to 300 KB. Other Markdown files can use the seven named template sections or be converted with AI.
+Suggested headings are `## Use cases`, `## Inputs`, `## Outputs`, `## Procedure`, `## Expert decisions`, `## Limitations`, `## Examples`. Guided and AI authoring use them as a template. **A fixed instruction schema is not required for publication.** Catalogue metadata (title, description, domain, price and validation status) is still required.
+
+Upload your own UTF-8 Markdown file under **Upload / edit Markdown**, review and publish it in its original format without an API key. YAML name/description metadata fills empty editor fields when available; the instructions are preserved unchanged. Files can be up to 300 KB and must contain nonempty text.
+
+The **Adapt to BioSkillsHub’s suggested structure with AI** checkbox is off by default. If you choose it, inspect the source, explicitly consent to sharing and click **Analyse files with AI**. Review the returned draft, apply it to the review area, edit if needed, then save and publish after confirming review. Adaptation requires configured personal or hosted AI and accepts up to 200 KB of source text. Failure leaves the original file in the editor; checking the option alone never sends it to OpenAI. Uncheck it to dismiss the adaptation interface without changing the current editor content.
 
 Uploading only `SKILL.md` does not include linked scripts or references. For a complete multi-file workflow, select its ZIP under **Import files with AI**, inspect the selected files, consent to sharing, and review the converted draft. Supporting files are preserved as text for later extraction, not installed or executed.
