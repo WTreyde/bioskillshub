@@ -10,7 +10,7 @@ Public catalogue metadata includes title, summary, domain, author, price and cre
 
 ## HTTP contract
 
-All responses are JSON with `Cache-Control: no-store`. Errors use `{error: string}`. Browser mutations require `Origin` matching `APP_ORIGIN`. Session cookies are HttpOnly, SameSite Strict, expire after 12 hours and can be made Secure for HTTPS with COOKIE_SECURE=true. Team localhost SSH tunnels use false.
+API responses use JSON except downloadable source/ZIP attachments; all use `Cache-Control: no-store`. Errors use `{error: string}`. Browser mutations require `Origin` matching `APP_ORIGIN`. Session cookies are HttpOnly, SameSite Strict, expire after 12 hours and can be made Secure for HTTPS with COOKIE_SECURE=true. Team localhost SSH tunnels use false.
 
 | Method / endpoint | Contract |
 |---|---|
@@ -29,6 +29,9 @@ All responses are JSON with `Cache-Control: no-store`. Errors use `{error: strin
 | GET /api/skills/:id | Current metadata plus published version history |
 | POST /api/skills/:id/acquire | `{confirm:true}` → persistent entitlement, charged=0, mode=demo |
 | GET /api/skills/:id/versions/:number | Session + entitlement required; returns selected instructions |
+| POST /api/skills/:id/rating | `{stars: 1..5}` → save/update the acquired-skill user’s vote; owners excluded |
+| GET /api/skills/:id/versions/:number/package | Session + entitlement → Agent Skills ZIP with matching folder and provenance |
+| GET /api/agent/skills/:id/versions/:number/package | Read-only bearer + entitlement → the same Agent Skills ZIP |
 | GET/POST /api/tokens | List safe token metadata / `{name}` creates token shown once |
 | DELETE /api/tokens/:id | Revoke only current user's token |
 | GET /api/agent/skills | Bearer token → acquired metadata only |
@@ -36,7 +39,7 @@ All responses are JSON with `Cache-Control: no-store`. Errors use `{error: strin
 | POST /api/recommend | `{prompt}` → validated catalogue IDs and reasons, explicit mode |
 | POST /api/generate | `{title,answers,mode?}` → unsaved draft text; mode=template skips LLM |
 
-Draft fields: title, summary, domain (from the shared 17-domain list), integer price_cents, content, validation, release_notes. Uploaded/manual skill instructions may use any Markdown structure and must be nonempty plain text. Generated drafts use the suggested headings Use cases, Inputs, Outputs, Procedure, Expert decisions, Limitations, Examples; AI response validation still checks these sections. YAML name/description metadata may fill empty editor fields and is parsed as data with aliases disabled. Limits: JSON 1,850,000 bytes (stream-bounded before parsing), skill content/direct Markdown uploads 300,000 UTF-8 bytes, AI source uploads 200,000 bytes. JSON has headroom for escaped source text; field-level limits still apply. There is no arbitrary file execution.
+Draft fields: title, summary, domain (from the shared 17-domain list), integer price_cents, content, validation, release_notes. Uploaded/manual skill instructions may use any Markdown body structure and must be nonempty plain text. Publishing requires Agent Skills YAML frontmatter (name and description); the editor offers a non-AI metadata helper or explicit-consent AI conversion. Draft saves may retain incomplete format metadata. Generated drafts use the suggested headings Use cases, Inputs, Outputs, Procedure, Expert decisions, Limitations, Examples; AI response validation still checks these sections. YAML name/description metadata may fill empty editor fields and is parsed as data with aliases disabled. Limits: JSON 1,850,000 bytes (stream-bounded before parsing), skill content/direct Markdown uploads 300,000 UTF-8 bytes, AI source uploads 200,000 bytes. JSON has headroom for escaped source text; field-level limits still apply. There is no arbitrary file execution.
 
 Entitlements apply to all releases of a skill, with explicit retrieval version selection. Latest metadata is not a pinned scientific dependency. Publish and restore lock the parent skill row; database triggers reject edits/deletes of any published release.
 
@@ -77,3 +80,17 @@ ZIP decoding occurs locally in the browser. Central/local headers, CRCs, entry c
 ZIP containers allow 1,000,000 bytes and 1,000 entries, independently of the unchanged 200,000-byte/100-file source budget. Excluded private paths are skipped without inflation and do not consume the selected-source budget. Browser previews and explicit consent remain required.
 
 All authoring methods retain their selected interface when generating or applying a draft. A common editable review area and save/review/publish controls are visible beneath each method. Markdown uploads offer an unchecked optional adaptation checkbox, revealing an embedded source preview and explicit-consent AI conversion using the existing skill-import endpoint. Custom-heading files can be saved and published unchanged; no conversion occurs automatically.
+
+## Community feedback and eval indicators
+
+`POST /api/skills/:id/rating` accepts an integer `stars` from 1–5. It requires a same-origin session, acquisition and a non-owner account. Upsert enforces one current vote per user/skill. Public catalogue and signed-in detail expose real average/count; only the current user receives their own vote. Agent tokens cannot vote. Ratings refer to the skill across releases.
+
+`skill_demo_feedback` stores separate synthetic scores and an optional demo eval badge pinned to the seeded release. Its values never enter community aggregates. The dry-run/apply importer seeds 6–14 scores between 3.5 and 5 for each existing published skill, marking Rosalind/BioNeMo collections through their ID, owner, title or summary. It preserves existing feedback on rerun. Demo feedback is hidden on subsequent releases unless explicitly seeded later; it does not modify published versions.
+
+Drafts/releases carry `eval_status`: `not_evaluated`, `creator_reported` or `demo`. The checkbox is display-only; creator claims and demo passes have different visible labels. This platform does not execute or independently verify a harness. Published eval status is immutable along with the release.
+
+## Agent Skills format and export
+
+Reference: https://agentskills.io/specification (checked 20 September 2026). Metadata is parsed as YAML data with aliases, duplicate keys and unknown top-level fields rejected. Supported names use 1–64 lowercase ASCII letters/digits and single hyphens; description is nonempty and at most 1,024 characters. Optional license, compatibility, metadata string mapping and allowed-tools fields follow the format constraints. The body has no mandatory headings for manual uploads. Format validation does not establish runtime compatibility or scientific validity.
+
+`GET /api/skills/:id/versions/:number/package` and the corresponding `/api/agent/skills/:id/versions/:number/package` require the same entitlement as raw retrieval and return a ZIP containing `<name>/SKILL.md` and provenance JSON. The folder matches the frontmatter name. For legacy plain Markdown, exports add metadata from the release title/summary and report both source and exported hashes. Existing frontmatter is preserved if valid; malformed metadata requires a corrected release, rather than silently dropping attribution. Raw retrieval and restoration preserve historical bytes. Supporting files currently remain embedded as text in SKILL.md; no code is executed or automatically extracted. New publication and catalogue imports enforce the format.
