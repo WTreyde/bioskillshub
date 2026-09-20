@@ -11,7 +11,7 @@ export async function rateSkill(userId:string,skillId:string,input:unknown){
 }
 export async function seedDemoFeedback(apply=false){
  return transaction(async c=>{
-  const {rows}=await c.query(`SELECT s.id,s.owner_id,v.number,v.title,v.summary FROM skills s JOIN LATERAL(SELECT * FROM versions WHERE skill_id=s.id ORDER BY number DESC LIMIT 1)v ON true ORDER BY s.id`);
+  const {rows}=await c.query(`SELECT s.id,s.owner_id,v.number,v.title,v.summary FROM skills s JOIN LATERAL(SELECT * FROM versions WHERE skill_id=s.id ORDER BY number DESC LIMIT 1)v ON true WHERE NOT s.hidden ORDER BY s.id`);
   const plan=[];
   for(const skill of rows){
    let value=0;for(const letter of skill.id)value=(value*31+letter.charCodeAt(0))>>>0;

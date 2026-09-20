@@ -10,7 +10,7 @@ export async function catalog(userId:string) {
  (SELECT stars FROM skill_ratings WHERE skill_id=s.id AND user_id=$1) AS my_rating,
  (SELECT avg(score)::float FROM unnest(demo.ratings)score) AS demo_rating_average,COALESCE(cardinality(demo.ratings),0) AS demo_rating_count,
  EXISTS(SELECT 1 FROM entitlements e WHERE e.skill_id=s.id AND e.user_id=$1) AS acquired
- FROM skills s JOIN users u ON u.id=s.owner_id JOIN LATERAL(SELECT * FROM versions WHERE skill_id=s.id ORDER BY number DESC LIMIT 1) v ON true LEFT JOIN skill_demo_feedback demo ON demo.skill_id=s.id AND demo.version=v.number ORDER BY s.created_at`,[userId]);
+ FROM skills s JOIN users u ON u.id=s.owner_id JOIN LATERAL(SELECT * FROM versions WHERE skill_id=s.id ORDER BY number DESC LIMIT 1) v ON true LEFT JOIN skill_demo_feedback demo ON demo.skill_id=s.id AND demo.version=v.number WHERE NOT s.hidden ORDER BY s.created_at`,[userId]);
 }
 export async function owned(userId:string,id:string) {const [s]=await query('SELECT * FROM skills WHERE id=$1',[id]);if(!s)throw new HttpError(404,'Skill not found.');if(s.owner_id!==userId)throw new HttpError(403,'Only the creator can edit this skill.');return s;}
 export async function saveDraft(userId:string,input:unknown,id?:string) {
@@ -33,7 +33,7 @@ export async function restore(userId:string,id:string,number:number) {
  const {rows:[result]}=await c.query(`INSERT INTO versions(id,skill_id,number,title,summary,domain,price_cents,content,validation,release_notes,eval_status)
  SELECT $1,$2,COALESCE(MAX(number),0)+1,$3,$4,$5,$6,$7,$8,$9,$10 FROM versions WHERE skill_id=$2 RETURNING number`,[randomUUID(),id,v.title,v.summary,v.domain,v.price_cents,v.content,v.validation,`Restored version ${number}`,v.eval_status]);return result.number;});
 }
-export async function acquire(userId:string,id:string) {const [v]=await query('SELECT id FROM versions WHERE skill_id=$1 LIMIT 1',[id]);if(!v)throw new HttpError(404,'Published skill not found.');await query('INSERT INTO entitlements(user_id,skill_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[userId,id]);}
+export async function acquire(userId:string,id:string) {const [v]=await query('SELECT v.id FROM versions v JOIN skills s ON s.id=v.skill_id WHERE v.skill_id=$1 AND NOT s.hidden LIMIT 1',[id]);if(!v)throw new HttpError(404,'Published skill not found.');await query('INSERT INTO entitlements(user_id,skill_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[userId,id]);}
 export async function retrieve(userId:string,id:string,version:number) {
  const [entitlement]=await query('SELECT 1 FROM entitlements WHERE user_id=$1 AND skill_id=$2',[userId,id]);if(!entitlement)throw new HttpError(403,'Acquire this skill in BioSkillsHub before retrieving it.');
  const [v]=await query('SELECT skill_id,number,title,summary,content,validation,eval_status,published_at FROM versions WHERE skill_id=$1 AND number=$2',[id,version]);if(!v)throw new HttpError(404,'Requested version is unavailable.');return v;
