@@ -9,7 +9,7 @@ export async function catalog(userId:string) {
 }
 export async function owned(userId:string,id:string) {const [s]=await query('SELECT * FROM skills WHERE id=$1',[id]);if(!s)throw new HttpError(404,'Skill not found.');if(s.owner_id!==userId)throw new HttpError(403,'Only the creator can edit this skill.');return s;}
 export async function saveDraft(userId:string,input:unknown,id?:string) {
- const d=draftSchema.parse(input);try{validateContent(d.content);}catch(e){throw new HttpError(400,(e as Error).message);}
+ const d=draftSchema.parse(input);try{validateContent(d.content,false);}catch(e){throw new HttpError(400,(e as Error).message);}
  if(id)await owned(userId,id); const skillId=id??randomUUID();
  await transaction(async c=>{if(!id)await c.query('INSERT INTO skills(id,owner_id) VALUES($1,$2)',[skillId,userId]);
  await c.query(`INSERT INTO drafts(skill_id,title,summary,domain,price_cents,content,validation,release_notes) VALUES($1,$2,$3,$4,$5,$6,$7,$8)
@@ -17,7 +17,7 @@ export async function saveDraft(userId:string,input:unknown,id?:string) {
 }
 export async function publish(userId:string,id:string) {
  await owned(userId,id);
- return transaction(async c=>{await c.query('SELECT id FROM skills WHERE id=$1 FOR UPDATE',[id]);const {rows:[d]}=await c.query('SELECT * FROM drafts WHERE skill_id=$1 FOR UPDATE',[id]);if(!d)throw new HttpError(409,'Save a draft before publishing.');validateContent(d.content);
+ return transaction(async c=>{await c.query('SELECT id FROM skills WHERE id=$1 FOR UPDATE',[id]);const {rows:[d]}=await c.query('SELECT * FROM drafts WHERE skill_id=$1 FOR UPDATE',[id]);if(!d)throw new HttpError(409,'Save a draft before publishing.');validateContent(d.content,false);
  const {rows:[v]}=await c.query(`INSERT INTO versions(id,skill_id,number,title,summary,domain,price_cents,content,validation,release_notes)
  SELECT $1,$2,COALESCE(MAX(number),0)+1,$3,$4,$5,$6,$7,$8,$9 FROM versions WHERE skill_id=$2 RETURNING number`,[randomUUID(),id,d.title,d.summary,d.domain,d.price_cents,d.content,d.validation,d.release_notes]);
  await c.query('DELETE FROM drafts WHERE skill_id=$1',[id]);return v.number;});
