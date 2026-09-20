@@ -108,10 +108,6 @@ ZIP containers allow 1 MB / 1,000 entries while eligible source content remains 
 
 Typecheck, production build, 18 Node/PostgreSQL checks and 16 Python tests passed. Browser regressions cover each method retaining its interface, unchanged direct publication, optional adaptation, consent, conversion failure/retry and reviewed publication. The actual attachment is used locally with fixture model responses; no live AI conversion or scientific execution is claimed. Deployment requires latest merged main, npm ci and a rebuild; no migration.
 
-## BioNeMo Ramachandran case-study preparation
-
-Prepared the [paired backbone-audit protocol](../science/bionemo/ramachandran-case-study/README.md), shared task plus arm-specific suffixes, scoring rubric, incomplete study manifest and empty results worksheet. One frozen prediction is shared; both arms have CCTBX, and only the treatment receives the custom instruction/script package. The proposed Q9I1F6 identity, runtime compatibility, confidence encoding, reference artifacts and execution authorization remain outstanding. Attachment hashes are recorded without publishing its contents. No GPU, prediction, dependency installation, attached-script execution, scientific score or public skill import occurred. The user's no-run instruction remains in force.
-
 ## iPhone dialog and creator recovery — 20 September 2026
 
 Skill details now use a viewport-fixed native dialog with a persistent touch close control and backdrop dismissal. Creator studio removes the redundant top New skill button; its bottom Start a blank skill action confirms before discarding editor answers/chat. Other is supported throughout the shared domain list. Price input retains the user's editable text, including an empty value, and validates pounds/pence at save time.
@@ -139,3 +135,7 @@ Added reversible administrator catalogue hiding by exact skill ID, with dry-run 
 Successful creator publication now shows a native, keyboard/touch-dismissible confirmation and resets entry fields, review/eval selections, guided answers, conversation, upload previews and their recovery copy. Save draft and failed publication preserve input. Catalogue refresh failures after publication are reported as refresh failures, without suggesting the publication failed. Domain/validation defaults and the selected authoring method are retained for the next entry.
 
 Validation: typecheck, production build, 22 Node/PostgreSQL checks, 16 Python tests, full Chromium rehearsal and WebKit mobile regression passed using disposable local schemas and fixture AI. Browser coverage includes the success dialog/reset, failed-publication retry, refresh recovery and hidden cards in public/Explore/My library views. No deployment, live catalogue changes or paid provider calls were performed.
+
+## Post-hackathon closeout — 20 September 2026
+
+Platform release through PR #19 (`6565d91`) was deployed and verified. Exactly the two requested deployment-verification skills are hidden; versions and acquisitions remain intact. The website remains live until provider CPU retirement. The experimental case study was abandoned and its package removed; BioNeMo catalogue content remains. See [restart and private backup instructions](restart.md). A code clone cannot recreate user-uploaded catalogue content without the private database backup. Historical readiness statements above may be superseded by deployment records.
