@@ -99,3 +99,11 @@ Typecheck, build, PostgreSQL tests, sixteen Python tests and desktop/mobile brow
 ## Functional and bounded-load audit
 
 Completed the isolated audit described in [the QA report](qa/overnight-audit.md), with recoverable [checkpoints](qa/overnight-checkpoint.md). Fixed non-object JSON returning server errors and unexpected trailing skill-route segments invoking valid operations. Fourteen Node/PostgreSQL checks, sixteen Python tests, typecheck, production build, extended desktop/mobile flows, 335 measured local HTTP requests, restart persistence and synthetic backup/restore passed. Bounded load now runs in CI. Live public deployment, real OAuth/provider access and scientific validation remain separate gates; no production writes or paid calls were made.
+
+## Creator studio authoring and upload compatibility — 20 September 2026
+
+All four authoring methods retain their selected interface after generating/applying a draft, with a common review editor and save/review/publish controls. Suggested headings are visible. Custom-heading Markdown can be saved and published unchanged without AI; optional YAML metadata fills empty title/description fields. An unchecked adaptation checkbox offers explicit-consent AI conversion into the suggested structure within the Markdown interface. Failures preserve the source for retry; publication always requires review.
+
+ZIP containers allow 1 MB / 1,000 entries while eligible source content remains capped at 200 KB / 100 files. Excluded Git history, macOS metadata and private paths are skipped without decompression before source budgets are counted. The supplied Fiji archive contains 13 usable text files (120,314 bytes). Its content stays in private test evidence and is not seeded into the public catalogue or executed.
+
+Typecheck, production build, 18 Node/PostgreSQL checks and 16 Python tests passed. Browser regressions cover each method retaining its interface, unchanged direct publication, optional adaptation, consent, conversion failure/retry and reviewed publication. The actual attachment is used locally with fixture model responses; no live AI conversion or scientific execution is claimed. Deployment requires latest merged main, npm ci and a rebuild; no migration.

@@ -58,3 +58,7 @@ The same release makes the landing page permanent at `/` and `/about`, with the 
 ### Audit handoff
 
 The audit fixes strict API body/route validation and adds concurrency, ZIP boundary, negative-browser and bounded HTTP regressions. See `docs/qa/overnight-audit.md` and its checkpoint. Deploy the merged audit release with the usual build/restart; no migration. Verify real public login and provider configuration separately.
+
+### Creator studio upload follow-up
+
+Deploy the authoring/ZIP fix with npm ci and rebuild; no migration. Verify that all four methods retain their selected interface and show suggested headings and shared review controls. Custom-heading Markdown publishes unchanged by default; the optional adaptation checkbox must be off initially and require explicit sharing consent before any AI request. Verify ZIP preview excludes Git/macOS metadata. Keep the user-supplied Fiji archive private; it is test input, not an authorized public catalogue import. See the usage guide for standalone Markdown versus supporting-file import.
