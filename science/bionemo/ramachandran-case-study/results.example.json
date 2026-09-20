@@ -1,0 +1,50 @@
+{
+  "status": "not_run",
+  "study_manifest_sha256": null,
+  "reference_sha256": null,
+  "shared_stage_seconds": {
+    "provisioning": null,
+    "setup": null,
+    "prediction": null,
+    "transfer": null
+  },
+  "runs": [],
+  "run_record_template": {
+    "pair": null,
+    "condition": null,
+    "input_hashes_before": {},
+    "input_hashes_after": {},
+    "started_at": null,
+    "completed": null,
+    "warm_elapsed_seconds": null,
+    "tool_calls": null,
+    "human_interventions": [],
+    "errors": [],
+    "output_hashes": {},
+    "classification": {
+      "reference_records": null,
+      "correct_records": null,
+      "extra_or_invalid_records": null,
+      "correct_fraction": null
+    },
+    "outliers": {
+      "tp": null,
+      "fp": null,
+      "fn": null,
+      "precision": null,
+      "recall": null,
+      "unavailable_reasons": []
+    },
+    "coverage": {
+      "coordinate_assessed_missing": null,
+      "coordinate_assessed_extra": null,
+      "coordinate_unassessed_missing": null,
+      "coordinate_unassessed_extra": null,
+      "canonical_mapping_correct": null
+    },
+    "confidence_errors": null,
+    "interpretation_review": [],
+    "reviewed_by": null
+  },
+  "conclusions": null
+}
