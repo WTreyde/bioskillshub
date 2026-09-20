@@ -8,7 +8,7 @@ export type ChatState=z.infer<typeof chatSchema>;
 export const emptyChat:ChatState={messages:[],text:'',draft:null};
 // Recovery accepts incomplete input; normal draft validation still runs before saving.
 export const creatorRecoverySchema=z.object({
- draft:z.object({title:z.string(),summary:z.string(),domain:z.enum(domains),price_cents:z.number(),content:z.string().max(MAX_SKILL_BYTES),validation:z.string(),release_notes:z.string()}),
+ draft:z.object({title:z.string(),summary:z.string(),domain:z.enum(domains),price_cents:z.number(),content:z.string().max(MAX_SKILL_BYTES),validation:z.string(),release_notes:z.string(),eval_status:z.enum(['not_evaluated','creator_reported','demo']).default('not_evaluated')}),
  answers:z.record(z.string(),z.string()),editId:z.string().optional(),authorMode:z.enum(['Guided','Markdown','Import','Chat']),priceInput:z.string(),chat:chatSchema,
 });
 export function parsePrice(value:string){
