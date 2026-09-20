@@ -9,3 +9,7 @@ Copy run.example.json per run into a private results directory. Retain unsuccess
 Scientific owners must sign off the references and acceptance thresholds. The platform's seed validation labels remain pending until then.
 
 Use `compare.py BASELINE.json EXPERT.json --output PRIVATE_COMPARISON.json` to check paired settings and report recorded timing/metric differences while retaining failures. It does not establish significance or scientific validity. See [artifact intake](../../docs/scientific-intake.md).
+
+## BioNeMo backbone-audit case study
+
+The [Ramachandran case-study package](../bionemo/ramachandran-case-study/README.md) specifies one shared prediction, matched audit prompts, independent CCTBX reference scoring and an optional robustness suite. It is prepared but **not executed**. It tests a reusable instruction-and-script package, not improved folding. Its empty results worksheet is not compatible recorded evidence for `compare.py`; follow its dedicated rubric and record real observations only after separate execution authorization.

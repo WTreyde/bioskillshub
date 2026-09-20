@@ -1,0 +1,34 @@
+{
+  "status": "text-inspected-only; not executed or publicly imported",
+  "source": "user-supplied teammate archive",
+  "archive_name": "ramachandran-audit.zip",
+  "archive_sha256": "6a983609ba5ede6df513b720194ad047525f54b51b7320cc6ba8e485dcaf6fd2",
+  "public_redistribution_permission": "unconfirmed",
+  "files": [
+    {
+      "path": "ramachandran-audit/references/method-and-evaluation.md",
+      "bytes": 4594,
+      "sha256": "f6f1e4ab4a8dd59955140610d7375d92a8fc2de19221932a14e92f29226a08c9"
+    },
+    {
+      "path": "ramachandran-audit/agents/openai.yaml",
+      "bytes": 260,
+      "sha256": "563d9d97469b4d1c5311797e7a9e55f3dbf67cf1ddc3da3ca2c1b9aeb63fd9b0"
+    },
+    {
+      "path": "ramachandran-audit/scripts/test_analyze.py",
+      "bytes": 6494,
+      "sha256": "3552379bc72a14e5870a5339eecef944251334e2d563ef4ab3a644e4b800deaa"
+    },
+    {
+      "path": "ramachandran-audit/scripts/analyze.py",
+      "bytes": 13746,
+      "sha256": "dc8f93bc47e05c7e1f5da5b3ebc995d015a140e4c65b5119d0ab5514502150da"
+    },
+    {
+      "path": "ramachandran-audit/SKILL.md",
+      "bytes": 4566,
+      "sha256": "f06b669790da33fadb9d9d88544bec1cafef2a6c6e133c34e137799ff34f8dee"
+    }
+  ]
+}

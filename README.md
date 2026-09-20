@@ -82,3 +82,5 @@ Creator studio also supports **Import files with AI** for a single UTF-8 source 
 The attached chemical reaction prediction workflow is available as a free contributor skill owned by ak; [import instructions](science/ak/README.md) preserve the original attachment and existing credentials.
 
 For a bounded synthetic HTTP/concurrency audit, build first and run `npm run test:load` against a local disposable test configuration. It refuses an occupied app port, creates/cleans its own schema, runs finite scenarios and verifies restart persistence. Set `REHEARSAL_DB_PORT` if your local test database is not on 5442. Never point it at production. See [audit coverage and findings](docs/qa/overnight-audit.md).
+
+A [BioNeMo Ramachandran audit case study](science/bionemo/ramachandran-case-study/README.md) is prepared with matched prompts and a scoring rubric. It compares audits of the same frozen prediction with and without an expert skill package. It has not been run and does not claim improved prediction accuracy.
