@@ -76,7 +76,7 @@ async function handle(request:Request,ctx:{params:Promise<{path:string[]}>}) {
  const ids=new Set(metadata.map(s=>s.id));return json({mode:'llm',recommendations:parsed.recommendations.filter(s=>ids.has(s.id))});
  }
  if(route==='generate'&&method==='POST'){
- const raw=await body(request);const d=guidedSchema.parse(raw);const template=scaffold(d.title,d.answers);
+ const raw=await body(request);const d=guidedSchema.parse(raw);const missing=fields.filter(f=>!d.answers[f]?.trim());if(missing.length)throw new HttpError(400,`Please complete the guided answers: ${missing.join(', ')}.`);const template=scaffold(d.title,d.answers);
  if(raw.mode==='template')return json({content:template,mode:'template',note:'Structured from your answers; no model was used.'});
  const personal=personalAI(raw.ai);
  const content=await generate(user.id,'draft',`Convert the expert answers to a Markdown skill. Use exactly these level-2 headings: ${fields.join(', ')}. Preserve scientific uncertainty and expert choices. Never invent parameter values, validation results or executable dependencies. No surrounding code fence. This is a draft for human review, not a verified protocol.`,{title:d.title,answers:d.answers},personal);
