@@ -26,7 +26,7 @@ test('complete marketplace and agent access lifecycle against PostgreSQL',async(
  assert.equal((await call('auth/me','GET',undefined,b)).data.user.id,'buyer');
  const content=await readFile('science/imagej/SKILL.md','utf8');
  const draft={title:'Fluorescence test workflow',summary:'A reproducible fluorescence workflow for testing entitlement boundaries.',domain:'Imaging',price_cents:500,content,validation:'Test fixture only',release_notes:'Initial release'};
- assert.equal((await call('skills','POST',{...draft,content:'Malformed without required sections'},c)).status,400);
+ assert.equal((await call('skills','POST',{...draft,content:'   '},c)).status,400);
  assert.equal((await call('skills','POST',draft,c,undefined,'https://evil.example')).status,403);
  const created=await call('skills','POST',draft,c);assert.equal(created.status,201);const id=created.data.id;
  assert.equal((await call('catalog','GET',undefined,b)).data.skills.length,0,'Draft must not be listed');
@@ -162,5 +162,11 @@ test('complete marketplace and agent access lifecycle against PostgreSQL',async(
  await call('auth/logout','POST',{},b);assert.equal((await call('catalog','GET',undefined,b)).status,401);
  // A fresh connection verifies state is committed, not held in app memory.
  const fresh=new pg.Client({connectionString:process.env.DATABASE_URL});await fresh.connect();try{assert.equal((await fresh.query('SELECT count(*) FROM versions')).rows[0].count,'4');}finally{await fresh.end();}
+ // Direct uploads keep arbitrary headings and short instructions unchanged.
+ const custom='## My own workflow\nInspect the input and report limitations.';
+ const direct=await call('skills','POST',{...draft,content:custom},c);assert.equal(direct.status,201);
+ assert.equal((await call(`skills/${direct.data.id}/publish`,'POST',{reviewed:true},c)).status,200);
+ await call(`skills/${direct.data.id}/acquire`,'POST',{confirm:true},c);
+ assert.equal((await call(`skills/${direct.data.id}/versions/1`,'GET',undefined,c)).data.content,custom);
  }finally{await pool.end();await admin.query(`DROP SCHEMA ${schema} CASCADE`);await admin.end();}
 });
