@@ -1,0 +1,9 @@
+Assess the supplied frozen BioNeMo-predicted protein structure.
+
+Biological question: Which regions have prediction-confidence evidence and plausible backbone geometry supporting cautious local structural interpretation, and which require closer inspection?
+
+Your shared inputs are in INPUT_DIRECTORY. Read its provenance, canonical sequence, predicted coordinates and any supplied confidence artifacts. The prediction is already complete. Do not provision compute, call a prediction service, refold, repair or modify the input coordinates. Work only in your isolated workspace; put deliverables in OUTPUT_DIRECTORY. Use the installed public analysis tools and the supplied common vendor documentation. Do not access other runs, hidden reference results or coordinator materials.
+
+Produce residue-specific favored/allowed/outlier classifications using the installed CCTBX mmtbx.validation.ramalyze reference method (available in both conditions), class-appropriate plots, an outlier table and assessment coverage. Preserve chain, residue, insertion-code, model and alternate-conformation identities where present. Explain unassessed residues and distinguish coverage of present coordinates from coverage of the supplied canonical sequence. Relate geometry to prediction confidence only where provenance, units and residue mapping support that interpretation; otherwise state what is unavailable.
+
+Deliver a concise biological interpretation, machine-readable residue/outlier/coverage tables, plots and a report with source hashes, tool versions, commands, limitations and runtime. Distinguish backbone plausibility from fold correctness and biological function. Document any unsupported inputs or failures rather than inventing results. Work within the agreed AUDIT_TIME_LIMIT_SECONDS and equal resource limits; record any requested human intervention.
