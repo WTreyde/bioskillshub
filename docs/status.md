@@ -99,3 +99,11 @@ Typecheck, build, PostgreSQL tests, sixteen Python tests and desktop/mobile brow
 ## Functional and bounded-load audit
 
 Completed the isolated audit described in [the QA report](qa/overnight-audit.md), with recoverable [checkpoints](qa/overnight-checkpoint.md). Fixed non-object JSON returning server errors and unexpected trailing skill-route segments invoking valid operations. Fourteen Node/PostgreSQL checks, sixteen Python tests, typecheck, production build, extended desktop/mobile flows, 335 measured local HTTP requests, restart persistence and synthetic backup/restore passed. Bounded load now runs in CI. Live public deployment, real OAuth/provider access and scientific validation remain separate gates; no production writes or paid calls were made.
+
+## Native skill upload compatibility — 20 September 2026
+
+Creator studio accepts native `SKILL.md` YAML name/description metadata with custom workflow headings, alongside the existing seven-section format. Upload fills empty catalogue title/description fields and preserves the source instructions; publication still requires explicit review. The attached Fiji example exposed the previous format rejection. A standalone Markdown upload does not include its linked supporting files; the editor and usage guide now explain the ZIP alternative.
+
+ZIP containers allow 1 MB / 1,000 entries while eligible source content remains capped at 200 KB / 100 files. Excluded Git history, macOS metadata and private paths are skipped without decompression before source budgets are counted. The supplied archive contains 13 usable text files (120,314 bytes). Its content stays in private test evidence and is not seeded into the public catalogue or executed.
+
+Typecheck, production build, 17 Node/PostgreSQL checks and 16 Python tests passed. Browser testing exercises the actual attached Markdown through metadata autofill, save and reviewed publication, plus ZIP preview and the existing desktop/mobile authoring paths. Live AI conversion is not claimed tested. Deployment requires latest merged main, `npm ci` for the YAML dependency and a rebuild; no migration.
