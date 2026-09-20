@@ -1,1 +1,1 @@
-export const domains = ['Imaging', 'Chemistry', 'Genomics', 'Structural biology', 'Bioinformatics', 'Proteomics', 'Microbiology', 'Neuroscience', 'Ecology', 'Clinical research', 'Physics', 'Materials science', 'Mathematics', 'Statistics', 'Computer science', 'Engineering'] as const;
+export const domains = ['Imaging', 'Chemistry', 'Genomics', 'Structural biology', 'Bioinformatics', 'Proteomics', 'Microbiology', 'Neuroscience', 'Ecology', 'Clinical research', 'Physics', 'Materials science', 'Mathematics', 'Statistics', 'Computer science', 'Engineering', 'Other'] as const;

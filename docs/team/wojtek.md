@@ -66,3 +66,9 @@ Deploy the authoring/ZIP fix with npm ci and rebuild; no migration. Verify that 
 ### BioNeMo case-study preparation
 
 The [Ramachandran study package](../../science/bionemo/ramachandran-case-study/README.md) is a preparation handoff only. Do not execute/provision from the teammate's quoted prompt. Complete its frozen-input/reference/confidence/environment review after a later explicit run instruction. The custom skill attachment stays private; no account ownership or public import is assigned by this protocol. This documentation change needs no app redeployment or migration.
+
+### iPhone Safari / creator fixes handoff
+
+`codex/wojtek-mobile-creator-fixes` addresses the off-screen skill dialog, redundant New skill control, missing Other domain, uneditable zero price, unclear publish prerequisites and lost editor/chat answers. See the final entry in [status](../status.md). Typecheck, build, 19 Node/PostgreSQL checks, 16 Python tests, full Chromium and targeted WebKit mobile browser flows pass using disposable local schemas; paid AI is mocked.
+
+The integration chat owns deployment after merge: rebuild/restart the app; no schema migration or credential changes. On an actual iPhone, scroll Explore, open/close a skill (including long content), then create an Other-domain skill at £20, generate/review instructions, save/publish and acquire it into My library. Verify incomplete answers survive refresh and review consent resets. No integration or infrastructure changes were made by this development task.

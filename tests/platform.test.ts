@@ -24,6 +24,7 @@ test('complete marketplace and agent access lifecycle against PostgreSQL',async(
  const b=(await call('auth/login','POST',{id:'buyer',password:'test-password-123'})).cookie!;
  const o=(await call('auth/login','POST',{id:'outsider',password:'test-password-123'})).cookie!;
  assert.equal((await call('auth/me','GET',undefined,b)).data.user.id,'buyer');
+ const incomplete=await call('generate','POST',{title:'Incomplete guided fixture',answers:{},mode:'template'},c);assert.equal(incomplete.status,400);assert.match(incomplete.data.error,/Please complete the guided answers/);
  const content=await readFile('science/imagej/SKILL.md','utf8');
  const draft={title:'Fluorescence test workflow',summary:'A reproducible fluorescence workflow for testing entitlement boundaries.',domain:'Imaging',price_cents:500,content,validation:'Test fixture only',release_notes:'Initial release'};
  assert.equal((await call('skills','POST',{...draft,content:'   '},c)).status,400);
