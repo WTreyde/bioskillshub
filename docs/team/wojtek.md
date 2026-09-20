@@ -75,7 +75,7 @@ The integration chat owns deployment after merge: rebuild/restart the app; no sc
 
 ### Community feedback / Agent Skills deployment handoff
 
-Branch: `codex/wojtek-ratings-agent-skills`, based on the mobile fixes in PR #17. Merge #17 first; if the feature PR still targets its branch, retarget the feature PR to main after that merge. All required checks, Chromium/WebKit browser flows and the bounded-load audit passed locally.
+Branch: `codex/wojtek-ratings-agent-skills`, PR #18 targets main; PR #17 is merged. All required checks, Chromium/WebKit browser flows and the bounded-load audit passed locally. The WebKit rehearsal now waits for recovery/reset state and finishes catalogue prefetches before its deliberate refresh, retaining all recovery/security and browser-error assertions. Confirm the latest PR revision has green CI before deployment.
 
 The integration administrator should:
 
