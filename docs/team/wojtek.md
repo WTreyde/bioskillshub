@@ -72,3 +72,17 @@ The [Ramachandran study package](../../science/bionemo/ramachandran-case-study/R
 `codex/wojtek-mobile-creator-fixes` addresses the off-screen skill dialog, redundant New skill control, missing Other domain, uneditable zero price, unclear publish prerequisites and lost editor/chat answers. See the final entry in [status](../status.md). Typecheck, build, 19 Node/PostgreSQL checks, 16 Python tests, full Chromium and targeted WebKit mobile browser flows pass using disposable local schemas; paid AI is mocked.
 
 The integration chat owns deployment after merge: rebuild/restart the app; no schema migration or credential changes. On an actual iPhone, scroll Explore, open/close a skill (including long content), then create an Other-domain skill at £20, generate/review instructions, save/publish and acquire it into My library. Verify incomplete answers survive refresh and review consent resets. No integration or infrastructure changes were made by this development task.
+
+### Community feedback / Agent Skills deployment handoff
+
+Branch: `codex/wojtek-ratings-agent-skills`, based on the mobile fixes in PR #17. Merge #17 first; if the feature PR still targets its branch, retarget the feature PR to main after that merge. All required checks, Chromium/WebKit browser flows and the bounded-load audit passed locally.
+
+The integration administrator should:
+
+1. Preserve a database backup and deploy the tested merged revision using the established procedure.
+2. Run `npm run db:migrate` against integration using its existing private configuration. This adds `skill_ratings`, `skill_demo_feedback` and `eval_status` columns on drafts/releases; existing content and accounts are preserved.
+3. Rebuild/restart the app. No new package dependencies or credentials are needed.
+4. Run `npm run db:seed-demo-feedback` to review the plan, then `npm run db:seed-demo-feedback -- --apply` to add the explicitly requested demo scores/badges. The importer is idempotent and only uses currently published skills. Rosalind/BioNeMo detection uses ID, owner, title and summary; inspect that plan for the intended collection entries. Existing versions, real votes, drafts and credentials are not rewritten.
+5. Verify that demo labels remain visible, an acquired non-owner can rate/update, creator self-rating is unavailable, eval flags say creator-reported or DEMO ONLY, and a downloaded ZIP contains `<name>/SKILL.md`. Check a direct Markdown upload plus optional AI conversion with fixtures unless a live paid call is separately authorized.
+
+The eval checkbox is a presentation field only. Demo scores are not actual user reviews, and demo passes are not scientific/evaluation results. The development agent did not run migration/import against integration or the personal non-test schema.

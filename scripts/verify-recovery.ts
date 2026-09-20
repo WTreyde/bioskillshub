@@ -11,7 +11,7 @@ if(!['localhost','127.0.0.1','::1'].includes(source.hostname))throw Error('Recov
 if(process.argv[2]!=='--confirm-local')throw Error('Pass --confirm-local after checking DATABASE_URL points to your personal database.');
 const target=`bsh_restore_${randomUUID().replaceAll('-','')}`;
 const directory=path.resolve('.local/recovery',target);
-const tables=['users','skills','versions','drafts','entitlements','api_tokens','sessions','rate_limits','ai_usage','github_identities','oauth_states'];
+const tables=['users','skills','versions','drafts','entitlements','api_tokens','sessions','rate_limits','ai_usage','github_identities','oauth_states','skill_ratings','skill_demo_feedback'];
 const client=new pg.Client({connectionString:source.toString()});
 let restored:pg.Client|undefined,created=false,connected=false,stage='connect';
 const env={...process.env,PGHOST:source.hostname,PGPORT:source.port||'5432',PGUSER:decodeURIComponent(source.username),PGPASSWORD:decodeURIComponent(source.password),PGDATABASE:decodeURIComponent(source.pathname.slice(1)),PGOPTIONS:''};
@@ -47,7 +47,7 @@ try{
  const trigger=await restored.query("SELECT 1 FROM pg_trigger WHERE tgname='immutable_versions' AND tgrelid='public.versions'::regclass AND tgenabled='O'");
  if(trigger.rowCount!==1)throw Error('Restored database lacks the published-version immutability trigger.');
  await writeFile(path.join(directory,'verification.json'),JSON.stringify({verified_at:new Date().toISOString(),source:'local personal database',tables:before,immutable_trigger:true,backup:'database.dump'},null,2),{mode:0o600});
- console.log('PASS: backup restored; all eleven tables match the snapshot and the immutability trigger is enabled.');
+ console.log('PASS: backup restored; all application tables match the snapshot and the immutability trigger is enabled.');
  console.log(`Private evidence: ${directory}`);
 }catch(error){console.error(`Recovery verification failed during ${stage}; no source data was changed.`);process.exitCode=1;}
 finally{

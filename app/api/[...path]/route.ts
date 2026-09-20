@@ -1,3 +1,6 @@
+import {rateSkill} from '@/lib/feedback';
+import {skillPackage} from '@/lib/skill-package';
+import {makeAgentSkill,agentSkillsPrompt} from '@/lib/agent-skill-format';
 import {MAX_JSON_BYTES} from '@/lib/upload-limits';
 import {NextResponse} from 'next/server';
 import {randomUUID} from 'node:crypto';
@@ -45,6 +48,7 @@ async function handle(request:Request,ctx:{params:Promise<{path:string[]}>}) {
  if(path[0]==='agent'){
  if(method!=='GET')throw new HttpError(405,'Agent endpoints are read-only.');const user=await agentUser(request);
  if(route==='agent/skills')return json({skills:(await catalog(user.id)).filter(x=>x.acquired)});
+ if(path.length===6&&path[1]==='skills'&&path[3]==='versions'&&path[5]==='package')return skillPackage(await retrieve(user.id,path[2],integer.parse(Number(path[4]))) as Parameters<typeof skillPackage>[0]);
  if(path.length===5&&path[1]==='skills'&&path[3]==='versions') {const v=await retrieve(user.id,path[2],integer.parse(Number(path[4])));return json({...v,sha256:hash(v.content)});}
  throw new HttpError(404,'Agent endpoint not found.');
  }
@@ -54,11 +58,13 @@ async function handle(request:Request,ctx:{params:Promise<{path:string[]}>}) {
  if(route==='skills'&&method==='POST')return json({id:await saveDraft(user.id,await body(request))},201);
  if(path[0]==='skills'&&path.length>=2){const id=path[1];
  if(path.length===2&&method==='GET'){
- const list=await catalog(user.id);const skill=list.find(x=>x.id===id);if(!skill)throw new HttpError(404,'Skill not found.');return json({skill,versions:await query('SELECT number,validation,release_notes,published_at FROM versions WHERE skill_id=$1 ORDER BY number DESC',[id])});}
- if(path.length===3&&path[2]==='draft'&&method==='GET'){await owned(user.id,id);const [draft]=await query('SELECT * FROM drafts WHERE skill_id=$1',[id]);const [latest]=draft?[]:await query('SELECT * FROM versions WHERE skill_id=$1 ORDER BY number DESC LIMIT 1',[id]);return json({draft:draft??latest});}
+ const list=await catalog(user.id);const skill=list.find(x=>x.id===id);if(!skill)throw new HttpError(404,'Skill not found.');return json({skill,versions:await query(`SELECT v.number,v.validation,v.release_notes,v.published_at,CASE WHEN v.eval_status='not_evaluated' AND d.eval_passed THEN 'demo' ELSE v.eval_status END AS eval_status FROM versions v LEFT JOIN skill_demo_feedback d ON d.skill_id=v.skill_id AND d.version=v.number WHERE v.skill_id=$1 ORDER BY v.number DESC`,[id])});}
+ if(path.length===3&&path[2]==='draft'&&method==='GET'){await owned(user.id,id);const [draft]=await query('SELECT * FROM drafts WHERE skill_id=$1',[id]);const [latest]=draft?[]:await query('SELECT * FROM versions WHERE skill_id=$1 ORDER BY number DESC LIMIT 1',[id]);const current=draft??latest;const [demo]=draft?[]:await query('SELECT eval_passed FROM skill_demo_feedback WHERE skill_id=$1 AND version=$2',[id,latest?.number]);return json({draft:current?{...current,eval_status:current.eval_status==='not_evaluated'&&demo?.eval_passed?'demo':current.eval_status}:current});}
  if(path.length===3&&path[2]==='draft'&&method==='POST')return json({id:await saveDraft(user.id,await body(request),id)});
  if(path.length===3&&path[2]==='publish'&&method==='POST'){const d=await body(request);if(d.reviewed!==true)throw new HttpError(400,'Review the complete draft before publishing.');return json({number:await publish(user.id,id)});}
  if(path.length===3&&path[2]==='restore'&&method==='POST'){const d=await body(request);return json({number:await restore(user.id,id,integer.parse(d.number))});}
+ if(path.length===3&&path[2]==='rating'&&method==='POST'){await rateSkill(user.id,id,await body(request));return json({saved:true});}
+ if(path.length===5&&path[2]==='versions'&&path[4]==='package'&&method==='GET')return skillPackage(await retrieve(user.id,id,integer.parse(Number(path[3]))) as Parameters<typeof skillPackage>[0]);
  if(path.length===3&&path[2]==='acquire'&&method==='POST'){const d=await body(request);if(d.confirm!==true)throw new HttpError(400,'Confirm simulated checkout.');await acquire(user.id,id);return json({acquired:true,charged:0,mode:'demo'});}
  if(path[2]==='versions'&&path.length===4&&method==='GET'){const version=await retrieve(user.id,id,integer.parse(Number(path[3])));return json({...version,sha256:hash(version.content)});}
  }
@@ -79,8 +85,8 @@ async function handle(request:Request,ctx:{params:Promise<{path:string[]}>}) {
  const raw=await body(request);const d=guidedSchema.parse(raw);const missing=fields.filter(f=>!d.answers[f]?.trim());if(missing.length)throw new HttpError(400,`Please complete the guided answers: ${missing.join(', ')}.`);const template=scaffold(d.title,d.answers);
  if(raw.mode==='template')return json({content:template,mode:'template',note:'Structured from your answers; no model was used.'});
  const personal=personalAI(raw.ai);
- const content=await generate(user.id,'draft',`Convert the expert answers to a Markdown skill. Use exactly these level-2 headings: ${fields.join(', ')}. Preserve scientific uncertainty and expert choices. Never invent parameter values, validation results or executable dependencies. No surrounding code fence. This is a draft for human review, not a verified protocol.`,{title:d.title,answers:d.answers},personal);
- try{validateContent(content);}catch{throw new HttpError(502,'Generated draft missed required sections. Try again or use the structured template.');}return json({content,mode:'llm'});
+ const content=await generate(user.id,'draft',`${agentSkillsPrompt} Convert the expert answers to a Markdown skill. Use exactly these level-2 headings: ${fields.join(', ')}. Preserve scientific uncertainty and expert choices. Never invent parameter values, validation results or executable dependencies. No surrounding code fence. This is a draft for human review, not a verified protocol.`,{title:d.title,answers:d.answers},personal);
+ try{validateContent(content);return json({content:makeAgentSkill(content,d.title,d.answers['Use cases'].slice(0,1024)),mode:'llm'});}catch{throw new HttpError(502,'Generated draft has invalid Agent Skills metadata or missing sections. Try again or use the structured template.');}
  }
  throw new HttpError(404,'Endpoint not found.');
  }catch(e){if(e instanceof HttpError)return json({error:e.message},e.status);if(e instanceof ZodError)return json({error:e.issues.map(i=>`${i.path.join('.')}: ${i.message}`).join('; ')},400);console.error('API operation failed:',e instanceof Error?e.name:'unknown');return json({error:'Service unavailable. Check the server and database configuration.'},500);}

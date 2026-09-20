@@ -84,3 +84,11 @@ The attached chemical reaction prediction workflow is available as a free contri
 For a bounded synthetic HTTP/concurrency audit, build first and run `npm run test:load` against a local disposable test configuration. It refuses an occupied app port, creates/cleans its own schema, runs finite scenarios and verifies restart persistence. Set `REHEARSAL_DB_PORT` if your local test database is not on 5442. Never point it at production. See [audit coverage and findings](docs/qa/overnight-audit.md).
 
 A [BioNeMo Ramachandran audit case study](science/bionemo/ramachandran-case-study/README.md) is prepared with matched prompts and a scoring rubric. It compares audits of the same frozen prediction with and without an expert skill package. It has not been run and does not claim improved prediction accuracy.
+
+## Agent Skills and community feedback
+
+Publishing checks [Agent Skills metadata](https://agentskills.io/specification); manual bodies keep their headings. Creator studio can add metadata without AI or convert uploads with explicit-consent AI. Acquired versions include an Agent Skills ZIP download. Existing immutable release content/hashes are preserved.
+
+Acquired-skill users can rate 1–5 stars; each account has one editable vote and creators cannot rate their own skills. Synthetic demo ratings are separate. Eval badges distinguish creator-reported passes from demo-only indicators; no eval harness runs in this app.
+
+Upgrade handoff: back up, run `npm run db:migrate`, rebuild/restart, then review `npm run db:seed-demo-feedback` and use `npm run db:seed-demo-feedback -- --apply` to populate labelled samples for existing skills. This seeds no real reviews or verified eval results. The integration administrator owns these actions.
