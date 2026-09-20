@@ -1,3 +1,5 @@
+import {expect} from 'playwright/test';
+import {acknowledgePublication} from './rehearse-publication.mjs';
 import {zipSync,strToU8} from 'fflate';
 import {chromium,webkit} from 'playwright';
 import {mobileCreatorRegression} from './rehearse-mobile-creator.mjs';
@@ -80,7 +82,7 @@ try {
  assert.equal((await db.query('SELECT count(*) FROM versions')).rows[0].count,'0');
  await page.getByLabel('I have reviewed the full instructions',{exact:false}).check();
  await page.getByRole('button',{name:'Publish reviewed version'}).click();
- await page.getByRole('status').filter({hasText:'Published immutable version 1'}).waitFor();
+ await acknowledgePublication(page);
  const skill=(await db.query('SELECT skill_id FROM versions')).rows[0].skill_id;
  pass('review and immutable version 1 publication');
  await page.getByRole('button',{name:'Sign out',exact:true}).click();await page.waitForURL(origin+'/#sign-in');await login('efe');
@@ -183,9 +185,12 @@ try {
  await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();
  pass('manual Markdown draft saved');
  const editedContent=manualContent+'\nManual edit verified.';await page.getByLabel('Skill instructions').fill(editedContent);await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();
- pass('manual edit saved');assert.equal(await page.getByRole('button',{name:'Publish reviewed version',exact:true}).isDisabled(),true);await page.getByLabel('I have reviewed the full instructions',{exact:false}).check();await page.getByRole('button',{name:'Publish reviewed version',exact:true}).click();await page.getByRole('status').filter({hasText:'Published immutable version 1'}).waitFor();
+ pass('manual edit saved');assert.equal(await page.getByRole('button',{name:'Publish reviewed version',exact:true}).isDisabled(),true);await page.getByLabel('I have reviewed the full instructions',{exact:false}).check();await page.getByRole('button',{name:'Publish reviewed version',exact:true}).click();await acknowledgePublication(page);
  assert.equal((await db.query('SELECT content FROM versions WHERE title=$1',['Manual Markdown fixture'])).rows[0].content,editedContent);assert.equal(unexpectedAI,0);await page.unroute('**/api/generate');
  assert.deepEqual(errors,[]);pass('large uppercase Markdown upload, manual editing, save/review/publish with no AI key or provider calls');
+ // Reopen the saved contribution after publication cleared the editor.
+ await page.locator('.own-list').getByRole('button',{name:/Manual Markdown fixture/}).click();
+ await expect(page.getByLabel('Skill instructions')).toHaveValue(editedContent);
  // Invalid uploads and draft validation must preserve the last valid instructions.
  await page.getByLabel('Import a Markdown file',{exact:false}).setInputFiles({name:'invalid.md',mimeType:'text/markdown',buffer:Buffer.from([0xff,0xfe])});
  await page.getByRole('alert').filter({hasText:'must use UTF-8'}).waitFor();assert.equal(await page.getByLabel('Skill instructions').inputValue(),editedContent);
@@ -211,8 +216,10 @@ try {
  assert.equal(await page.getByRole('button',{name:'Analyse files with AI',exact:true}).count(),0);
  await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();
  assert.equal(await page.getByRole('button',{name:'Publish reviewed version',exact:true}).isDisabled(),true);
- await page.getByLabel('I have reviewed the full instructions',{exact:false}).check();await page.getByRole('button',{name:'Publish reviewed version',exact:true}).click();await page.getByRole('status').filter({hasText:'Published immutable version 1'}).waitFor();
- const nativeTitle=await page.getByLabel('Skill title',{exact:true}).inputValue();assert.equal((await db.query('SELECT content FROM versions WHERE title=$1',[nativeTitle])).rows[0].content,nativeContent);
+ const nativeTitle=await page.getByLabel('Skill title',{exact:true}).inputValue();
+ await page.getByLabel('I have reviewed the full instructions',{exact:false}).check();await page.getByRole('button',{name:'Publish reviewed version',exact:true}).click();await acknowledgePublication(page);
+ assert.equal((await db.query('SELECT content FROM versions WHERE title=$1',[nativeTitle])).rows[0].content,nativeContent);
+ await page.getByLabel('Import a Markdown file',{exact:false}).setInputFiles({name:'SKILL.md',mimeType:'text/markdown',buffer:Buffer.from(nativeContent)});
  await page.getByLabel('Convert to Agent Skills format with AI',{exact:true}).check();assert.equal(await page.getByRole('button',{name:'Analyse files with AI',exact:true}).isDisabled(),true);
  await page.getByLabel('Convert to Agent Skills format with AI',{exact:true}).uncheck();assert.equal(await page.getByRole('button',{name:'Analyse files with AI',exact:true}).count(),0);
  pass('custom-heading Markdown publishes unchanged without AI; optional adaptation defaults off');
@@ -227,7 +234,7 @@ try {
  assert.equal(conversionCalls,2);assert.equal(await page.getByRole('button',{name:'Upload / edit Markdown',exact:true}).getAttribute('class'),'chosen');assert.equal(await page.getByLabel('Skill instructions').inputValue(),content);
  assert.equal(await page.getByRole('button',{name:'Publish reviewed version',exact:true}).isDisabled(),true);
  await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();
- await page.getByLabel('I have reviewed the full instructions',{exact:false}).check();await page.getByRole('button',{name:'Publish reviewed version',exact:true}).click();await page.getByRole('status').filter({hasText:'Published immutable version 1'}).waitFor();
+ await page.getByLabel('I have reviewed the full instructions',{exact:false}).check();await page.getByRole('button',{name:'Publish reviewed version',exact:true}).click();await acknowledgePublication(page);
  assert.equal((await db.query('SELECT content FROM versions WHERE title=$1',['Converted workflow fixture'])).rows[0].content,content);await page.unroute('**/api/skill-import');
  pass('optional Markdown adaptation requires consent and review; failure preserves source; all methods keep their selected interface');
  await page.getByRole('button',{name:'Import files with AI',exact:true}).click();

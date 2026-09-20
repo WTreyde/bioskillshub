@@ -9,6 +9,7 @@
     "build": "next build",
     "start": "next start --hostname 0.0.0.0",
     "typecheck": "tsc --noEmit",
+    "db:visibility": "tsx --env-file=.env scripts/skill-visibility.ts",
     "db:migrate": "tsx --env-file=.env scripts/migrate.ts",
     "db:recovery": "tsx --env-file=.env scripts/verify-recovery.ts",
     "db:setup": "tsx --env-file=.env scripts/setup.ts",
