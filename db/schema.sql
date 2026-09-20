@@ -54,3 +54,19 @@ CREATE TABLE IF NOT EXISTS oauth_states (
  state_hash text PRIMARY KEY, browser_hash text NOT NULL, verifier text NOT NULL,
  expires_at timestamptz NOT NULL
 );
+
+-- Additive upgrade: existing immutable releases retain their original content.
+ALTER TABLE drafts ADD COLUMN IF NOT EXISTS eval_status text NOT NULL DEFAULT 'not_evaluated' CHECK(eval_status IN ('not_evaluated','creator_reported','demo'));
+ALTER TABLE versions ADD COLUMN IF NOT EXISTS eval_status text NOT NULL DEFAULT 'not_evaluated' CHECK(eval_status IN ('not_evaluated','creator_reported','demo'));
+CREATE TABLE IF NOT EXISTS skill_ratings (
+ skill_id text NOT NULL REFERENCES skills(id), user_id text NOT NULL REFERENCES users(id),
+ stars integer NOT NULL CHECK(stars BETWEEN 1 AND 5),
+ updated_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY(skill_id,user_id)
+);
+-- Synthetic presentation data never contributes to real community aggregates.
+CREATE TABLE IF NOT EXISTS skill_demo_feedback (
+ skill_id text PRIMARY KEY REFERENCES skills(id), version integer NOT NULL,
+ ratings numeric[] NOT NULL CHECK(cardinality(ratings)>0 AND 3.5<=ALL(ratings) AND 5>=ALL(ratings)),
+ eval_passed boolean NOT NULL DEFAULT false,
+ FOREIGN KEY(skill_id,version) REFERENCES versions(skill_id,number)
+);

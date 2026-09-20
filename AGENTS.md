@@ -7,7 +7,7 @@ Read README.md, docs/architecture.md and your docs/team/<name>.md before changin
 - Next.js/TypeScript/PostgreSQL; hackathon demo, four seeded team accounts plus optional open GitHub registration, public catalogue metadata, simulated purchases.
 - Functional browse → create → review → publish → acquire → token retrieval. Published versions are immutable.
 - Skills are authorised downloads, not DRM. Never claim that an agent can read instructions while its controlling user cannot.
-- Ratings, subscriptions and collaborative authorship are labelled roadmap previews only.
+- Community ratings are implemented for acquired skills. Synthetic ratings and eval badges must remain labelled demo data and separate from real feedback. Subscriptions and collaborative authorship are roadmap previews.
 - Codex is the integration target until Rosalind access is tested. Do not label an untested integration verified.
 - ImageJ and ADMET skills are prototype content until domain owners supply and validate scientific evidence. Never invent results or metrics.
 

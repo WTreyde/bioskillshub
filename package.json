@@ -17,6 +17,7 @@
     "db:seed-literature": "tsx --env-file=.env scripts/seed-literature.ts",
     "db:seed-rosalind": "tsx --env-file=.env scripts/seed-rosalind.ts",
     "db:seed-anthropic": "tsx --env-file=.env scripts/seed-anthropic.ts",
+    "db:seed-demo-feedback": "tsx --env-file=.env scripts/seed-demo-feedback.ts",
     "db:seed-ak": "tsx --env-file=.env scripts/seed-ak.ts",
     "test:load": "node --env-file=.env scripts/audit-load.mjs"
   },

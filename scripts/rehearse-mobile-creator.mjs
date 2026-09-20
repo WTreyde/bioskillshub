@@ -1,13 +1,20 @@
 import assert from 'node:assert/strict';
-import {writeFile} from 'node:fs/promises';
+import {expect} from 'playwright/test';
+import {unzipSync,strFromU8} from 'fflate';
+import {readFile,writeFile} from 'node:fs/promises';
 
 // Called only by the disposable-schema rehearsal. AI endpoints use fixtures.
-export async function mobileCreatorRegression({browser,origin,password,db,evidence}) {
+export async function mobileCreatorRegression({browser,origin,password,buyerPassword,db,evidence}) {
  const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
  const page=await context.newPage();page.setDefaultTimeout(15000);
  const errors=[];page.on('pageerror',e=>errors.push(e.name));
  const button=name=>page.getByRole('button',{name,exact:true});
  const studio=()=>button('Creator studio').click();
+ const answer=()=>page.getByLabel('Your workflow or answer');
+ // DOM commits and sessionStorage recovery writes finish asynchronously in WebKit.
+ // Wait for the state being tested, never retry the action or relax its expected value.
+ const recoveredChat=()=>page.evaluate(()=>JSON.parse(sessionStorage.getItem('bsh-creator:wojtek')||'null')?.chat);
+
  try{
   const login=await page.request.post(origin+'/api/auth/login',{headers:{Origin:origin},data:{id:'wojtek',password}});assert.ok(login.ok());
   console.log('MOBILE: session ready');
@@ -30,6 +37,8 @@ export async function mobileCreatorRegression({browser,origin,password,db,eviden
   assert.match(await page.locator('#publish-help').innerText(),/tick the checkbox/);
   console.log('MOBILE: generating template');
   for(const name of ['Use cases','Inputs','Outputs','Procedure','Expert decisions','Limitations','Examples'])await page.getByLabel(name,{exact:true}).fill('Synthetic mobile '+name+'; no scientific evidence.');
+  await page.getByLabel('Skill instructions',{exact:true}).fill('# Custom instructions\nInspect the synthetic input.');
+  await button('Add Agent Skills metadata').click();await page.getByRole('status').filter({hasText:'Agent Skills metadata added'}).waitFor();assert.match(await page.getByLabel('Skill instructions',{exact:true}).inputValue(),/^---\nname: mobile-recovery-fixture/);
   await button('Use structured template').click();await page.getByRole('status').filter({hasText:'Structured from your answers'}).waitFor();
   console.log('MOBILE: checking invalid price');
   await price.fill('');await button('Save draft').click();await page.getByRole('alert').filter({hasText:'Enter a demo price'}).waitFor();
@@ -41,11 +50,12 @@ export async function mobileCreatorRegression({browser,origin,password,db,eviden
   await button('Save draft').click();await page.getByRole('status').filter({hasText:'Draft saved in Your contributions'}).waitFor();
   await page.getByLabel('I have reviewed the full instructions',{exact:false}).check();await price.fill('20');
   assert.equal(await page.getByLabel('I have reviewed the full instructions',{exact:false}).isChecked(),false,'Price edits require a fresh review');
+  await page.getByLabel('Passed an eval harness',{exact:true}).check();
   await page.getByLabel('I have reviewed the full instructions',{exact:false}).check();await button('Publish reviewed version').click();
   await page.getByRole('status').filter({hasText:'Published immutable version 1'}).waitFor();
   console.log('MOBILE: published');
-  const {rows:[release]}=await db.query('SELECT skill_id,domain,price_cents FROM versions WHERE title=$1',['Mobile recovery fixture']);
-  assert.equal(release.domain,'Other');assert.equal(release.price_cents,2000);
+  const {rows:[release]}=await db.query('SELECT skill_id,domain,price_cents,eval_status FROM versions WHERE title=$1',['Mobile recovery fixture']);
+  assert.equal(release.domain,'Other');assert.equal(release.price_cents,2000);assert.equal(release.eval_status,'creator_reported');
   await button('Explore').click();await page.getByRole('button',{name:/Mobile recovery fixture/}).click();
   let dialog=page.getByRole('dialog');await dialog.waitFor();
   async function visibleDialog(){
@@ -65,23 +75,57 @@ export async function mobileCreatorRegression({browser,origin,password,db,eviden
   assert.equal(await button('Close details').evaluate(el=>{const r=el.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight;}),true,'Long content retains touch close');
   await button('Close details').tap();await page.getByRole('button',{name:/^My library/}).tap();await page.getByRole('button',{name:/Mobile recovery fixture/}).waitFor();
   console.log('MOBILE: checking chat recovery');
-  await studio();await button('Chat with AI').click();await page.getByLabel('Your workflow or answer').fill('Unsent chat answer survives navigation.');
-  await button('Explore').click();await studio();assert.equal(await page.getByLabel('Your workflow or answer').inputValue(),'Unsent chat answer survives navigation.');
+  await studio();await button('Chat with AI').click();await answer().fill('Unsent chat answer survives navigation.');
+  await button('Explore').click();await studio();await expect(answer(),'Unsent chat survives navigation/refresh').toHaveValue('Unsent chat answer survives navigation.');
+  await expect.poll(async()=>(await recoveredChat())?.text,{message:'Unsent chat reaches recovery storage before reload'}).toBe('Unsent chat answer survives navigation.');
   console.log('MOBILE: refreshing recovery');
-  await page.reload();await studio();assert.equal(await page.getByLabel('Your workflow or answer').inputValue(),'Unsent chat answer survives navigation.');
+  await page.reload();await studio();await expect(answer(),'Unsent chat survives navigation/refresh').toHaveValue('Unsent chat answer survives navigation.');
   // Enable an inert personal fixture and intercept all conversation requests.
   await button('AI settings').click();const dummy='sk-mobile-fixture-not-a-real-key';await page.getByLabel('OpenAI API key',{exact:true}).fill(dummy);await page.getByRole('checkbox').check();await button('Enable personal key').click();
   await page.route('**/api/skill-chat',route=>route.fulfill({json:{message:'Synthetic follow-up question.',draft:null}}));
   await studio();await button('Send to skill assistant').click();await page.getByText('Synthetic follow-up question.',{exact:true}).waitFor();
   assert.equal(await page.evaluate(key=>JSON.stringify({...localStorage,...sessionStorage}).includes(key),dummy),false);
+  await expect.poll(async()=>(await recoveredChat())?.messages.at(-1)?.content,{message:'Chat response reaches recovery storage before reload'}).toBe('Synthetic follow-up question.');
   console.log('MOBILE: refreshing recovery');
   await page.reload();await studio();await page.getByText('Synthetic follow-up question.',{exact:true}).waitFor();
-  assert.equal(await button('Send to skill assistant').isDisabled(),true,'Refresh removes the API key');
-  page.once('dialog',d=>d.dismiss());await button('Start a blank skill').click();assert.equal(await page.getByLabel('Skill title',{exact:true}).inputValue(),'Mobile recovery fixture');
-  page.once('dialog',d=>d.accept());await button('Start a blank skill').click();assert.equal(await page.getByLabel('Skill title',{exact:true}).inputValue(),'');
-  assert.equal(await page.getByText('Synthetic follow-up question.',{exact:true}).count(),0);
+  console.log('MOBILE: checking key removal after refresh');
+  // An empty answer also disables Send, so use nonempty input to test key removal.
+  await answer().fill('Nonempty answer requires a newly enabled API key.');
+  await expect(button('Send to skill assistant'),'Refresh removes the API key').toBeDisabled();
+  assert.equal(await page.evaluate(key=>JSON.stringify({...localStorage,...sessionStorage}).includes(key),dummy),false,'Refresh leaves no API key in browser storage');
+  console.log('MOBILE: checking cancelled and confirmed reset');
+  page.once('dialog',d=>d.dismiss());await button('Start a blank skill').click();await expect(page.getByLabel('Skill title',{exact:true}),'Cancelling reset preserves the editor').toHaveValue('Mobile recovery fixture');
+  page.once('dialog',d=>d.accept());await button('Start a blank skill').click();await expect(page.getByLabel('Skill title',{exact:true}),'Confirmed reset clears the editor').toHaveValue('');
+  await expect(page.getByText('Synthetic follow-up question.',{exact:true}),'Confirmed reset clears the recovered conversation').toHaveCount(0);
+  await expect.poll(recoveredChat,{message:'Confirmed reset clears the recovery copy'}).toEqual({messages:[],text:'',draft:null});
+  console.log('MOBILE: checking sign-out recovery cleanup');
   await button('Sign out').click();await page.waitForURL(origin+'/#sign-in');
   assert.equal(await page.evaluate(()=>sessionStorage.getItem('bsh-creator:wojtek')),null,'Sign-out clears private recovery');
+  console.log('MOBILE: checking community ratings and package');
+  // A separate buyer casts real votes; sample feedback remains separate.
+  const buyerLogin=await page.request.post(origin+'/api/auth/login',{headers:{Origin:origin},data:{id:'efe',password:buyerPassword}});assert.ok(buyerLogin.ok());await page.goto(origin+'/workspace');
+  await page.getByRole('button',{name:/Mobile recovery fixture/}).click();await page.getByText('Eval harness passed · creator-reported, not verified',{exact:true}).waitFor();
+  await page.getByRole('button',{name:/Add to library/}).click();await page.getByRole('button',{name:'Confirm demo acquisition',exact:false}).click();
+  await page.getByRole('radio',{name:'5 stars',exact:true}).check();await button('Save rating').click();await page.getByRole('dialog').getByText('★ 5.0 / 5 · 1 community rating',{exact:true}).waitFor();
+  await page.getByRole('radio',{name:'4 stars',exact:true}).check();await button('Update rating').click();await page.getByRole('dialog').getByText('★ 4.0 / 5 · 1 community rating',{exact:true}).waitFor();
+  const downloaded=page.waitForEvent('download');await page.getByRole('link',{name:'Download Agent Skills ZIP',exact:true}).click();const download=await downloaded;const files=unzipSync(new Uint8Array(await readFile(await download.path())));assert.ok(files['mobile-recovery-fixture/SKILL.md']);assert.match(strFromU8(files['mobile-recovery-fixture/SKILL.md']),/^---\nname: mobile-recovery-fixture/);
+  await button('Close details').click();
+  await db.query("INSERT INTO skill_demo_feedback(skill_id,version,ratings,eval_passed) VALUES($1,1,ARRAY[3.5,4,4.5,5],true)",[release.skill_id]);
+  await page.goto(origin+'/browse');await page.getByText('Demo ★ 4.3 / 5 · 4 sample ratings · not user reviews',{exact:true}).waitFor();await page.getByText('★ 4.0 / 5 · 1 community rating',{exact:true}).waitFor();
+  // Display a demo eval flag on an unevaluated synthetic legacy release.
+  await db.query("INSERT INTO skills(id,owner_id) VALUES('rosalind-mobile-demo','wojtek')");
+  await db.query("INSERT INTO versions(id,skill_id,number,title,summary,domain,price_cents,content,validation) SELECT 'rosalind-mobile-demo-v1','rosalind-mobile-demo',1,'Rosalind demo fixture',summary,domain,0,content,validation FROM versions WHERE skill_id=$1 AND number=1",[release.skill_id]);
+  await db.query("INSERT INTO skill_demo_feedback VALUES('rosalind-mobile-demo',1,ARRAY[4,4.5,5],true)");
+  // Finish catalogue Link prefetches before the deliberate refresh; WebKit reports
+  // interrupted prefetches as page errors. Keep the no-browser-errors assertion.
+  await page.waitForLoadState('networkidle');
+  await page.reload();await page.getByText('Eval harness passed · DEMO ONLY, no evaluation evidence',{exact:true}).waitFor();
+  await page.screenshot({path:evidence+'/community-feedback-mobile.png',fullPage:true});
+  console.log('MOBILE: checking browser errors');
   assert.deepEqual(errors,[]);
- }catch(e){await page.screenshot({path:evidence+'/mobile-failure.png',fullPage:true});await writeFile(evidence+'/mobile-error.txt',String(e.stack),{mode:0o600});throw e;}finally{await context.close();}
+ }catch(e){
+  // Only print a source location: full assertion values can contain recovery text.
+  const location=String(e.stack).match(/rehearse-mobile-creator\.mjs:\d+:\d+/)?.[0]||'unknown';
+  console.error('MOBILE failure:',e.name,'at',location);
+  await page.screenshot({path:evidence+'/mobile-failure.png',fullPage:true});await writeFile(evidence+'/mobile-error.txt',String(e.stack),{mode:0o600});throw e;}finally{await context.close();}
 }

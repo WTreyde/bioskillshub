@@ -13,7 +13,7 @@ test('adversarial requests and concurrent marketplace operations',async t=>{
  try{
  await query(await readFile('db/schema.sql','utf8'));
  for(const id of ['owner','buyer','outsider']){await query('INSERT INTO users VALUES($1,$1,$1,$1)',[id]);await query("INSERT INTO sessions VALUES($1,$2,now()+interval '1 hour')",[hash(`synthetic-${id}`),id]);}
- const content=['Use cases','Inputs','Outputs','Procedure','Expert decisions','Limitations','Examples'].map(x=>`## ${x}\nSynthetic fixture only, no scientific result.`).join('\n\n');
+ const content='---\nname: audit-fixture\ndescription: Synthetic audit fixture for platform tests.\n---\n'+['Use cases','Inputs','Outputs','Procedure','Expert decisions','Limitations','Examples'].map(x=>`## ${x}\nSynthetic fixture only, no scientific result.`).join('\n\n');
  const draft={title:'Concurrent fixture workflow',summary:'Synthetic audit protocol for validating concurrency and access control.',domain:'Physics',price_cents:0,content,validation:'Software fixture only'};
  async function call(path:string,data?:unknown,user='owner',method=data===undefined?'GET':'POST'){
   const request=new Request(`http://localhost:3004/api/${path}`,{method,headers:{origin:'http://localhost:3004','content-type':'application/json',cookie:`bsh_session=synthetic-${user}`},body:method==='GET'?undefined:JSON.stringify(data)});

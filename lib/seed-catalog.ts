@@ -1,3 +1,4 @@
+import {agentSkillMetadata} from './agent-skill-format';
 import {randomUUID} from 'node:crypto';
 import {z} from 'zod';
 import {draftSchema,validateContent} from './validation';
@@ -7,7 +8,7 @@ type SeedEntry=z.infer<typeof draftSchema>&{id:string};
 // Atomic import. An explicit profile policy may create a curator or reassign unchanged seeds.
 // Existing credentials, drafts, entitlements and published releases are never modified.
 export async function seedCatalog(owner:string,entries:SeedEntry[],apply=false,profile?:{name:string;expertise:string;reassignMatching:boolean}){
- for(const entry of entries){draftSchema.parse(entry);validateContent(entry.content);}
+ for(const entry of entries){draftSchema.parse(entry);validateContent(entry.content);agentSkillMetadata(entry.content);}
  if(new Set(entries.map(e=>e.id)).size!==entries.length)throw Error('Duplicate catalogue IDs');
  return transaction(async c=>{
   await c.query("SELECT pg_advisory_xact_lock(hashtext('bioskillshub-catalog-import'))");

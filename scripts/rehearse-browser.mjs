@@ -78,7 +78,7 @@ try {
  await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();
  pass('guided template and draft save; publish disabled before review');
  assert.equal((await db.query('SELECT count(*) FROM versions')).rows[0].count,'0');
- await page.getByRole('checkbox').check();
+ await page.getByLabel('I have reviewed the full instructions',{exact:false}).check();
  await page.getByRole('button',{name:'Publish reviewed version'}).click();
  await page.getByRole('status').filter({hasText:'Published immutable version 1'}).waitFor();
  const skill=(await db.query('SELECT skill_id FROM versions')).rows[0].skill_id;
@@ -205,7 +205,7 @@ try {
  const nativeContent=process.env.NATIVE_SKILL_FIXTURE?await readFile(process.env.NATIVE_SKILL_FIXTURE,'utf8'):'---\nname: native-workflow\ndescription: Inspect example inputs with explicit settings and reproducible outputs.\n---\n\n# Native workflow\n\n## First interaction\nAsk which inputs to inspect. Preserve raw inputs and record decisions and limitations before reporting results.\n';
  await page.getByRole('button',{name:'Creator studio',exact:true}).click();page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'Start a blank skill',exact:true}).click();await page.getByRole('button',{name:'Upload / edit Markdown',exact:true}).click();
  await page.getByLabel('Import a Markdown file',{exact:false}).setInputFiles({name:'SKILL.md',mimeType:'text/markdown',buffer:Buffer.from(nativeContent)});
- await page.getByLabel('Adapt to BioSkillsHub’s suggested structure with AI',{exact:true}).waitFor();assert.equal(await page.getByLabel('Adapt to BioSkillsHub’s suggested structure with AI',{exact:true}).isChecked(),false);
+ await page.getByLabel('Convert to Agent Skills format with AI',{exact:true}).waitFor();assert.equal(await page.getByLabel('Convert to Agent Skills format with AI',{exact:true}).isChecked(),false);
  assert.ok((await page.getByLabel('Skill title',{exact:true}).inputValue()).length>0);assert.ok((await page.getByLabel('Short description').inputValue()).length>0);
  assert.equal(await page.getByLabel('Skill instructions').inputValue(),nativeContent);
  assert.equal(await page.getByRole('button',{name:'Analyse files with AI',exact:true}).count(),0);
@@ -213,12 +213,12 @@ try {
  assert.equal(await page.getByRole('button',{name:'Publish reviewed version',exact:true}).isDisabled(),true);
  await page.getByLabel('I have reviewed the full instructions',{exact:false}).check();await page.getByRole('button',{name:'Publish reviewed version',exact:true}).click();await page.getByRole('status').filter({hasText:'Published immutable version 1'}).waitFor();
  const nativeTitle=await page.getByLabel('Skill title',{exact:true}).inputValue();assert.equal((await db.query('SELECT content FROM versions WHERE title=$1',[nativeTitle])).rows[0].content,nativeContent);
- await page.getByLabel('Adapt to BioSkillsHub’s suggested structure with AI',{exact:true}).check();assert.equal(await page.getByRole('button',{name:'Analyse files with AI',exact:true}).isDisabled(),true);
- await page.getByLabel('Adapt to BioSkillsHub’s suggested structure with AI',{exact:true}).uncheck();assert.equal(await page.getByRole('button',{name:'Analyse files with AI',exact:true}).count(),0);
+ await page.getByLabel('Convert to Agent Skills format with AI',{exact:true}).check();assert.equal(await page.getByRole('button',{name:'Analyse files with AI',exact:true}).isDisabled(),true);
+ await page.getByLabel('Convert to Agent Skills format with AI',{exact:true}).uncheck();assert.equal(await page.getByRole('button',{name:'Analyse files with AI',exact:true}).count(),0);
  pass('custom-heading Markdown publishes unchanged without AI; optional adaptation defaults off');
  await page.getByRole('button',{name:'AI settings',exact:true}).click();await page.getByLabel('OpenAI API key',{exact:true}).fill(dummyKey);await page.getByRole('checkbox').check();await page.getByRole('button',{name:'Enable personal key',exact:true}).click();
  await page.getByRole('button',{name:'Creator studio',exact:true}).click();page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'Start a blank skill',exact:true}).click();await page.getByLabel('Import a Markdown file',{exact:false}).setInputFiles({name:'SKILL.md',mimeType:'text/markdown',buffer:Buffer.from(nativeContent)});
- await page.getByLabel('Adapt to BioSkillsHub’s suggested structure with AI',{exact:true}).check();
+ await page.getByLabel('Convert to Agent Skills format with AI',{exact:true}).check();
  let conversionCalls=0;
  await page.route('**/api/skill-import',async route=>{conversionCalls++;const body=route.request().postDataJSON();assert.equal(body.confirmed,true);assert.equal(body.files[0].content,nativeContent);if(conversionCalls===1){await route.fulfill({status:502,json:{error:'Conversion fixture failure'}});return;}await route.fulfill({json:{message:'Synthetic conversion; review before publishing.',draft:{title:'Converted workflow fixture',summary:'Synthetic conversion result for testing the schema and review workflow.',domain:'Imaging',content}}});});
  assert.equal(await page.getByRole('button',{name:'Analyse files with AI',exact:true}).isDisabled(),true);assert.equal(conversionCalls,0);
@@ -242,7 +242,7 @@ try {
  await db.query("UPDATE sessions SET expires_at=now()-interval '1 second' WHERE user_id='efe'");await page.reload();await page.waitForURL(origin+'/#sign-in');await page.getByRole('heading',{name:/Turn experience/}).waitFor();
  assert.equal(await page.getByRole('button',{name:'Creator studio',exact:true}).count(),0);assert.deepEqual(errors,[]);pass('expired session returns to public landing without cached workspace');
  }
- await mobileCreatorRegression({browser,origin,password:passwords.wojtek,db,evidence});pass('mobile dialog, price, Other domain, actionable save errors, recovery and publication');
+ await mobileCreatorRegression({browser,origin,password:passwords.wojtek,buyerPassword:passwords.efe,db,evidence});pass('mobile dialog, price, Other domain, actionable save errors, recovery and publication');
  await writeFile(evidence+'/result.json',JSON.stringify({time:new Date().toISOString(),scope:'Disposable schema in Wojtek database; synthetic software only',steps},null,2),{mode:0o600});
 } catch(e) {console.error('Rehearsal failed:',e.name,'after',steps.at(-1)||'startup','(details suppressed to protect credentials)');process.exitCode=1;}
 finally {
