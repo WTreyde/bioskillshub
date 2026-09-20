@@ -1,5 +1,10 @@
 # Recovery, account verification and shutdown
 
+## Post-hackathon status — 20 September 2026
+
+Follow [the restart guide](restart.md) for a new deployment or restore. The current website stays live until NVIDIA retires the CPU host. The coordinator disabled the old local CPU-stop job; the historical timer instructions below are not a request to install it again. The abandoned case study and its dedicated GPU are retired; catalogue skills are retained. A private database snapshot was restore-tested and saved off-instance. Later writes require a later backup.
+
+
 ## Recovery proof
 
 Run `npm run db:recovery -- --confirm-local` only after checking that the private `DATABASE_URL` targets your personal localhost database. Requires matching PostgreSQL `pg_dump` and `pg_restore` binaries in PATH (or `PG_DUMP_BIN` / `PG_RESTORE_BIN`) and permission to create a temporary database.

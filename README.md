@@ -2,6 +2,10 @@
 
 Expert scientific workflows, available to research agents through a versioned, access-controlled catalogue. The landing page at `/` and its `/about` alias explain the project for all visitors. The signed-in app lives at `/workspace`; clicking its BioSkillsHub logo returns home. Browse published metadata and filter all 17 domains (including Other and empty categories) at `/browse`; instruction downloads require sign-in and acquisition.
 
+## Restart after the hackathon
+
+See [backup and restart guide](docs/restart.md) for restoring the real catalogue, starting a fresh demo, updating GitHub sign-in and verifying recovery. Real database dumps and credentials must not be committed, including to a private repository.
+
 ## Run locally
 
 Requires Node.js 22+, Python 3.10+ and Docker Compose.
@@ -19,9 +23,9 @@ For the containerised app: `docker compose up -d --build`. Initialise a new data
 
 ## GitHub sign-in and upgrades
 
-Any GitHub account can join once an administrator creates an OAuth App and privately configures `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` and `GITHUB_ALLOW_SIGNUP=true`. The public sign-in page offers GitHub only; existing team credentials and the legacy API are preserved for operational compatibility. See [OAuth activation and identity mapping](docs/github-sign-in.md). Live GitHub authorization is unverified until those credentials are configured and exercised.
+Any GitHub account can join once an administrator creates an OAuth App and privately configures `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` and `GITHUB_ALLOW_SIGNUP=true`. The public sign-in page offers GitHub only; existing team credentials and the legacy API are preserved for operational compatibility. See [OAuth activation and identity mapping](docs/github-sign-in.md). GitHub sign-in was verified on the hackathon deployment. Every new origin still needs its own callback configuration and live sign-in check.
 
-For an existing database, back up first, run `npm run db:migrate` to add the OAuth tables, and restart the app. This preserves accounts, credentials and releases.
+For an existing database, back up first, run `npm run db:migrate` to apply the additive schema changes, and restart the app. This preserves accounts, credentials and releases.
 
 ## LLM features
 
@@ -83,7 +87,6 @@ The attached chemical reaction prediction workflow is available as a free contri
 
 For a bounded synthetic HTTP/concurrency audit, build first and run `npm run test:load` against a local disposable test configuration. It refuses an occupied app port, creates/cleans its own schema, runs finite scenarios and verifies restart persistence. Set `REHEARSAL_DB_PORT` if your local test database is not on 5442. Never point it at production. See [audit coverage and findings](docs/qa/overnight-audit.md).
 
-A [BioNeMo Ramachandran audit case study](science/bionemo/ramachandran-case-study/README.md) is prepared with matched prompts and a scoring rubric. It compares audits of the same frozen prediction with and without an expert skill package. It has not been run and does not claim improved prediction accuracy.
 
 ## Agent Skills and community feedback
 

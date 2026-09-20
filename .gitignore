@@ -9,3 +9,8 @@ __pycache__/
 .venv/
 results/
 data/private/
+
+# Private database exports; use .local/backups/ even for encrypted archives.
+*.dump
+*.backup
+backups/

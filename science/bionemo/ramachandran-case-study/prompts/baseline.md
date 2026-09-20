@@ -1,1 +1,0 @@
-Condition: no custom audit package. Independently construct your CCTBX invocation and reporting workflow using the installed public tools and common documentation. You do not have access to the custom ramachandran-audit skill or its helper scripts; do not obtain them from another workspace or the internet. Complete the task using your own workflow.
