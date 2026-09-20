@@ -1,5 +1,7 @@
 # Wojtek — integration, infrastructure and ADMET
 
+For post-hackathon recovery, start with [the restart guide](../restart.md). NVIDIA owns CPU retirement; preserve the existing live site until then.
+
 Read AGENTS.md, docs/architecture.md and docs/setup.md. Own server-side access control, PostgreSQL, agent retrieval and deployment. Efe owns primary UI edits. Keep all credentials private.
 
 ## Mentor questions to resolve now
@@ -62,10 +64,6 @@ The audit fixes strict API body/route validation and adds concurrency, ZIP bound
 ### Creator studio upload follow-up
 
 Deploy the authoring/ZIP fix with npm ci and rebuild; no migration. Verify that all four methods retain their selected interface and show suggested headings and shared review controls. Custom-heading Markdown publishes unchanged by default; the optional adaptation checkbox must be off initially and require explicit sharing consent before any AI request. Verify ZIP preview excludes Git/macOS metadata. Keep the user-supplied Fiji archive private; it is test input, not an authorized public catalogue import. See the usage guide for standalone Markdown versus supporting-file import.
-
-### BioNeMo case-study preparation
-
-The [Ramachandran study package](../../science/bionemo/ramachandran-case-study/README.md) is a preparation handoff only. Do not execute/provision from the teammate's quoted prompt. Complete its frozen-input/reference/confidence/environment review after a later explicit run instruction. The custom skill attachment stays private; no account ownership or public import is assigned by this protocol. This documentation change needs no app redeployment or migration.
 
 ### iPhone Safari / creator fixes handoff
 
