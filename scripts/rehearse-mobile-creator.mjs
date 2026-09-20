@@ -1,3 +1,4 @@
+import {acknowledgePublication} from './rehearse-publication.mjs';
 import assert from 'node:assert/strict';
 import {expect} from 'playwright/test';
 import {unzipSync,strFromU8} from 'fflate';
@@ -51,8 +52,20 @@ export async function mobileCreatorRegression({browser,origin,password,buyerPass
   await page.getByLabel('I have reviewed the full instructions',{exact:false}).check();await price.fill('20');
   assert.equal(await page.getByLabel('I have reviewed the full instructions',{exact:false}).isChecked(),false,'Price edits require a fresh review');
   await page.getByLabel('Passed an eval harness',{exact:true}).check();
-  await page.getByLabel('I have reviewed the full instructions',{exact:false}).check();await button('Publish reviewed version').click();
-  await page.getByRole('status').filter({hasText:'Published immutable version 1'}).waitFor();
+  await page.getByLabel('I have reviewed the full instructions',{exact:false}).check();
+  await page.route('**/api/skills/*/publish',route=>route.fulfill({status:503,json:{error:'Synthetic publication failure; retry.'}}));
+  await button('Publish reviewed version').click();await page.getByRole('alert').filter({hasText:'Synthetic publication failure'}).waitFor();
+  await expect(page.getByRole('dialog',{name:'Skill published',exact:true})).toHaveCount(0);
+  await expect(page.getByLabel('Skill title',{exact:true})).toHaveValue('Mobile recovery fixture');
+  await expect(price).toHaveValue('20');
+  assert.match(await page.getByLabel('Skill instructions').inputValue(),/## Procedure/);
+  await page.unroute('**/api/skills/*/publish');await button('Publish reviewed version').click();
+  await page.getByRole('dialog',{name:'Skill published',exact:true}).waitFor();
+  await page.screenshot({path:evidence+'/publication-success-mobile.png'});
+  await acknowledgePublication(page);
+  for(const name of ['Use cases','Inputs','Outputs','Procedure','Expert decisions','Limitations','Examples'])await expect(page.getByLabel(name,{exact:true})).toHaveValue('');
+  await page.reload();await studio();
+  await expect(page.getByLabel('Skill title',{exact:true})).toHaveValue('');
   console.log('MOBILE: published');
   const {rows:[release]}=await db.query('SELECT skill_id,domain,price_cents,eval_status FROM versions WHERE title=$1',['Mobile recovery fixture']);
   assert.equal(release.domain,'Other');assert.equal(release.price_cents,2000);assert.equal(release.eval_status,'creator_reported');
@@ -75,7 +88,7 @@ export async function mobileCreatorRegression({browser,origin,password,buyerPass
   assert.equal(await button('Close details').evaluate(el=>{const r=el.getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight;}),true,'Long content retains touch close');
   await button('Close details').tap();await page.getByRole('button',{name:/^My library/}).tap();await page.getByRole('button',{name:/Mobile recovery fixture/}).waitFor();
   console.log('MOBILE: checking chat recovery');
-  await studio();await button('Chat with AI').click();await answer().fill('Unsent chat answer survives navigation.');
+  await studio();await page.getByLabel('Skill title',{exact:true}).fill('Unpublished recovery fixture');await button('Chat with AI').click();await answer().fill('Unsent chat answer survives navigation.');
   await button('Explore').click();await studio();await expect(answer(),'Unsent chat survives navigation/refresh').toHaveValue('Unsent chat answer survives navigation.');
   await expect.poll(async()=>(await recoveredChat())?.text,{message:'Unsent chat reaches recovery storage before reload'}).toBe('Unsent chat answer survives navigation.');
   console.log('MOBILE: refreshing recovery');
@@ -94,7 +107,7 @@ export async function mobileCreatorRegression({browser,origin,password,buyerPass
   await expect(button('Send to skill assistant'),'Refresh removes the API key').toBeDisabled();
   assert.equal(await page.evaluate(key=>JSON.stringify({...localStorage,...sessionStorage}).includes(key),dummy),false,'Refresh leaves no API key in browser storage');
   console.log('MOBILE: checking cancelled and confirmed reset');
-  page.once('dialog',d=>d.dismiss());await button('Start a blank skill').click();await expect(page.getByLabel('Skill title',{exact:true}),'Cancelling reset preserves the editor').toHaveValue('Mobile recovery fixture');
+  page.once('dialog',d=>d.dismiss());await button('Start a blank skill').click();await expect(page.getByLabel('Skill title',{exact:true}),'Cancelling reset preserves the editor').toHaveValue('Unpublished recovery fixture');
   page.once('dialog',d=>d.accept());await button('Start a blank skill').click();await expect(page.getByLabel('Skill title',{exact:true}),'Confirmed reset clears the editor').toHaveValue('');
   await expect(page.getByText('Synthetic follow-up question.',{exact:true}),'Confirmed reset clears the recovered conversation').toHaveCount(0);
   await expect.poll(recoveredChat,{message:'Confirmed reset clears the recovery copy'}).toEqual({messages:[],text:'',draft:null});
@@ -121,6 +134,16 @@ export async function mobileCreatorRegression({browser,origin,password,buyerPass
   await page.waitForLoadState('networkidle');
   await page.reload();await page.getByText('Eval harness passed · DEMO ONLY, no evaluation evidence',{exact:true}).waitFor();
   await page.screenshot({path:evidence+'/community-feedback-mobile.png',fullPage:true});
+  console.log('MOBILE: checking hidden catalogue entries');
+  await db.query('UPDATE skills SET hidden=true WHERE id=$1',[release.skill_id]);
+  await page.waitForLoadState('networkidle');await page.reload();
+  await expect(page.getByRole('heading',{name:'Mobile recovery fixture',exact:true})).toHaveCount(0);
+  await expect(page.getByRole('heading',{name:'Rosalind demo fixture',exact:true})).toBeVisible();
+  await page.waitForLoadState('networkidle');await page.goto(origin+'/workspace');
+  await expect(page.getByRole('button',{name:/Rosalind demo fixture/})).toBeVisible();
+  await expect(page.getByRole('button',{name:/Mobile recovery fixture/})).toHaveCount(0);
+  await page.getByRole('button',{name:/^My library/}).click();
+  await expect(page.getByRole('button',{name:/Mobile recovery fixture/})).toHaveCount(0);
   console.log('MOBILE: checking browser errors');
   assert.deepEqual(errors,[]);
  }catch(e){

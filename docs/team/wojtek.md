@@ -86,3 +86,18 @@ The integration administrator should:
 5. Verify that demo labels remain visible, an acquired non-owner can rate/update, creator self-rating is unavailable, eval flags say creator-reported or DEMO ONLY, and a downloaded ZIP contains `<name>/SKILL.md`. Check a direct Markdown upload plus optional AI conversion with fixtures unless a live paid call is separately authorized.
 
 The eval checkbox is a presentation field only. Demo scores are not actual user reviews, and demo passes are not scientific/evaluation results. The development agent did not run migration/import against integration or the personal non-test schema.
+
+### Hide deployment verification skills
+
+The user requested hiding exactly these two live entries:
+
+- `Deployment verification — synthetic (PR #14)`
+- `HTTPS deployment verification — synthetic`
+
+After merging/deploying the visibility change, run `npm run db:migrate`, then `npm run db:visibility -- --list` using the integration administrator's existing private configuration. Match the exact titles above to IDs and check their owners; do not select other entries by a broad substring. If an exact title is missing or ambiguous, inspect the candidate records before applying.
+
+Preview `npm run db:visibility -- --hide --id FIRST_ID --id SECOND_ID`, then repeat with `--apply`. The command validates all IDs before changing anything and defaults to a dry run. Verify both titles disappear from `/browse`, signed-in Explore/My library, and the public catalogue API. Other skills must remain visible. To undo, use the same IDs with `--show --apply`.
+
+Hiding removes discovery, recommendations and new acquisition. It preserves creator contributions, published releases, ratings and entitlements; an already-authorised user can still retrieve a known pinned version. It is not content revocation. The development agent has not modified the integration database or hidden the live entries; the integration task owns applying this exact selection.
+
+The same release adds a dismissible publication-success dialog and clears the creator form only after a successful publish response. Verify a failed save/publish preserves inputs, successful publication clears title/description/instructions/price/notes/answers/chat and upload previews, and refresh does not restore the completed entry. Domain and validation return to their initial defaults; authoring mode stays selected. Saved contributions remain editable. Saving a draft does not clear the form.

@@ -70,3 +70,6 @@ CREATE TABLE IF NOT EXISTS skill_demo_feedback (
  eval_passed boolean NOT NULL DEFAULT false,
  FOREIGN KEY(skill_id,version) REFERENCES versions(skill_id,number)
 );
+
+-- Reversible discovery control; immutable releases and entitlements are retained.
+ALTER TABLE skills ADD COLUMN IF NOT EXISTS hidden boolean NOT NULL DEFAULT false;
