@@ -197,6 +197,28 @@ try {
  await page.getByRole('button',{name:'Read selected version',exact:true}).click();await page.locator('.skill-content').waitFor();assert.equal(await page.locator('.skill-content').textContent(),editedContent);
  await page.getByRole('dialog').getByRole('combobox').selectOption('1');await page.getByRole('button',{name:'Read selected version',exact:true}).click();await page.locator('.skill-content').waitFor();assert.equal(await page.locator('.skill-content').textContent(),editedContent);
  await page.getByRole('button',{name:'Close details',exact:true}).click();pass('creator restore and explicit earlier-version retrieval preserve content');
+ // Native SKILL.md uses its own workflow headings; uploading must preserve its bytes.
+ const nativeContent=process.env.NATIVE_SKILL_FIXTURE?await readFile(process.env.NATIVE_SKILL_FIXTURE,'utf8'):'---\nname: native-workflow\ndescription: Inspect example inputs with explicit settings and reproducible outputs.\n---\n\n# Native workflow\n\n## First interaction\nAsk which inputs to inspect. Preserve raw inputs and record decisions and limitations before reporting results.\n';
+ await page.getByRole('button',{name:'Creator studio',exact:true}).click();await page.getByRole('button',{name:'New skill',exact:true}).click();await page.getByRole('button',{name:'Upload / edit Markdown',exact:true}).click();
+ await page.getByLabel('Import a Markdown file',{exact:false}).setInputFiles({name:'SKILL.md',mimeType:'text/markdown',buffer:Buffer.from(nativeContent)});
+ await page.getByRole('status').filter({hasText:'Native skill format recognized'}).waitFor();
+ assert.ok((await page.getByLabel('Skill title',{exact:true}).inputValue()).length>0);assert.ok((await page.getByLabel('Short description').inputValue()).length>0);
+ assert.equal(await page.getByLabel('Skill instructions').inputValue(),nativeContent);
+ await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();
+ assert.equal(await page.getByRole('button',{name:'Publish reviewed version',exact:true}).isDisabled(),true);
+ await page.getByLabel('I have reviewed the full instructions',{exact:false}).check();await page.getByRole('button',{name:'Publish reviewed version',exact:true}).click();await page.getByRole('status').filter({hasText:'Published immutable version 1'}).waitFor();
+ const nativeTitle=await page.getByLabel('Skill title',{exact:true}).inputValue();
+ assert.equal((await db.query('SELECT content FROM versions WHERE title=$1',[nativeTitle])).rows[0].content,nativeContent);
+ pass('native SKILL.md metadata autofill, unchanged content, save and review-gated publication without AI');
+ await page.getByRole('button',{name:'Import files with AI',exact:true}).click();
+ const nativeArchive=process.env.NATIVE_ZIP_FIXTURE?await readFile(process.env.NATIVE_ZIP_FIXTURE):Buffer.from(zipSync({'native/SKILL.md':strToU8(nativeContent),'native/.git/history':strToU8('x'.repeat(250000))},{level:0}));
+ await page.getByLabel('Choose a single file or ZIP folder',{exact:true}).setInputFiles({name:'native.zip',mimeType:'application/zip',buffer:nativeArchive});
+ await page.getByRole('status').filter({hasText:'files selected locally'}).waitFor();
+ assert.ok(await page.locator('.import-file-list summary').count()>0);
+ assert.equal(await page.getByRole('button',{name:'Analyse files with AI',exact:true}).isDisabled(),true);
+ assert.equal(await page.locator('.import-file-list').getByText(/\.git\//).count(),0);
+ pass('ZIP with excluded repository metadata previews locally without credentials or provider calls');
+
  await db.query("UPDATE sessions SET expires_at=now()-interval '1 second' WHERE user_id='efe'");await page.reload();await page.waitForURL(origin+'/#sign-in');await page.getByRole('heading',{name:/Turn experience/}).waitFor();
  assert.equal(await page.getByRole('button',{name:'Creator studio',exact:true}).count(),0);assert.deepEqual(errors,[]);pass('expired session returns to public landing without cached workspace');
  await writeFile(evidence+'/result.json',JSON.stringify({time:new Date().toISOString(),scope:'Disposable schema in Wojtek database; synthetic software only',steps},null,2),{mode:0o600});

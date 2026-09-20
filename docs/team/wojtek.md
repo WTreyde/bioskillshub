@@ -58,3 +58,7 @@ The same release makes the landing page permanent at `/` and `/about`, with the 
 ### Audit handoff
 
 The audit fixes strict API body/route validation and adds concurrency, ZIP boundary, negative-browser and bounded HTTP regressions. See `docs/qa/overnight-audit.md` and its checkpoint. Deploy the merged audit release with the usual build/restart; no migration. Verify real public login and provider configuration separately.
+
+### Native skill upload follow-up
+
+Deploy the native Markdown/ZIP compatibility fix with `npm ci` and rebuild; no migration. Verify an existing `SKILL.md` with YAML name/description uploads and publishes without renaming its headings, and that a ZIP containing Git/macOS metadata previews only eligible source files. Keep the user-supplied Fiji archive private; it is a test input, not an authorized public catalogue import. See the usage guide for standalone Markdown versus supporting-file import.
