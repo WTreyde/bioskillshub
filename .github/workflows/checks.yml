@@ -28,11 +28,17 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: python3 -m unittest discover -s tests -p 'test_*.py'
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium webkit
       - run: npm run test:browser
         env:
           APP_ORIGIN: http://localhost:3004
           REHEARSAL_DB_PORT: '5432'
+      - run: npm run test:browser
+        env:
+          APP_ORIGIN: http://localhost:3004
+          REHEARSAL_DB_PORT: '5432'
+          REHEARSAL_BROWSER: webkit
+          REHEARSAL_MOBILE_ONLY: 'true'
       - run: npm run test:load
         env:
           APP_ORIGIN: http://localhost:3004

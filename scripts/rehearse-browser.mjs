@@ -1,5 +1,6 @@
 import {zipSync,strToU8} from 'fflate';
-import {chromium} from 'playwright';
+import {chromium,webkit} from 'playwright';
+import {mobileCreatorRegression} from './rehearse-mobile-creator.mjs';
 import pg from 'pg';
 import net from 'node:net';
 import {randomBytes,scryptSync,createHash} from 'node:crypto';
@@ -34,7 +35,8 @@ try {
  }
  server=spawn(process.execPath,['node_modules/next/dist/bin/next','start','--hostname','127.0.0.1','--port',appUrl.port||'3004'],{env:{...process.env,DATABASE_URL:url.toString(),APP_ORIGIN:origin,OPENAI_API_KEY:'',OPENAI_MODEL:'',GITHUB_CLIENT_ID:'',GITHUB_CLIENT_SECRET:''},stdio:'ignore'});
  for(let i=0;i<100;i++){if(server.exitCode!==null)throw Error('Rehearsal server could not start');try{if((await fetch(origin+'/api/auth/me')).ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
- browser=await chromium.launch({headless:true});
+ browser=await (process.env.REHEARSAL_BROWSER==='webkit'?webkit:chromium).launch({headless:true,executablePath:process.env.REHEARSAL_BROWSER_EXECUTABLE||undefined});
+ if(process.env.REHEARSAL_MOBILE_ONLY!=='true'){
  let page=await browser.newPage({viewport:{width:1440,height:1000},recordVideo:{dir:evidence,size:{width:1440,height:1000}}});
  const errors=[];page.on('pageerror',e=>errors.push(e.name));
  async function login(id){const response=await page.request.post(origin+'/api/auth/login',{headers:{Origin:origin},data:{id,password:passwords[id]}});assert.equal(response.ok(),true,'Synthetic account session');await page.goto(origin+'/workspace');await page.getByRole('button',{name:'Creator studio',exact:true}).waitFor();}
@@ -132,13 +134,13 @@ try {
  await page.getByRole('button',{name:'Use draft in editor',exact:true}).click();pass('chat draft applied');assert.equal(await page.getByRole('button',{name:'Chat with AI',exact:true}).getAttribute('class'),'chosen');assert.equal(await page.getByLabel('Your workflow or answer').count(),1);assert.equal(await page.getByLabel('Skill title',{exact:true}).inputValue(),'Conversational fixture workflow');pass('chat editor title verified');assert.equal(await page.getByLabel('Skill instructions').inputValue(),content);pass('chat editor content verified');assert.equal(await page.getByRole('button',{name:'Publish reviewed version'}).isDisabled(),true);
  await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();assert.equal((await db.query('SELECT count(*) FROM versions')).rows[0].count,'1');
  pass('chat draft saved');await page.unroute('**/api/skill-chat');await page.setViewportSize({width:1440,height:1000});pass('chat questions, failure retry, transcript context, draft review/save and mobile layout');
- await page.getByRole('button',{name:'New skill',exact:true}).click();await page.getByRole('button',{name:'Guided authoring',exact:true}).click();
+ page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'Start a blank skill',exact:true}).click();await page.getByRole('button',{name:'Guided authoring',exact:true}).click();
  await page.getByLabel('Skill title',{exact:true}).fill('Guided AI fixture');await page.getByLabel('Short description').fill('Synthetic guided AI creation fixture requiring human review.');
  for(const label of ['Use cases','Inputs','Outputs','Procedure','Expert decisions','Limitations','Examples'])await page.getByLabel(label,{exact:true}).fill('Synthetic '+label+' fixture only.');
  let guidedCalls=0;await page.route('**/api/generate',async route=>{guidedCalls++;assert.equal(route.request().postDataJSON().ai.apiKey,dummyKey);await route.fulfill({json:{content,mode:'ai'}});});
  await page.getByRole('button',{name:'Generate AI draft',exact:true}).click();await page.getByRole('status').filter({hasText:'AI draft generated'}).waitFor();assert.equal(await page.getByRole('button',{name:'Guided authoring',exact:true}).getAttribute('class'),'chosen');assert.equal(await page.getByLabel('Skill instructions').inputValue(),content);assert.equal(guidedCalls,1);assert.equal(await page.getByRole('button',{name:'Publish reviewed version',exact:true}).isDisabled(),true);
  await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();await page.unroute('**/api/generate');pass('guided AI creation transfers to editable review-gated draft');
- await page.getByRole('button',{name:'New skill',exact:true}).click();await page.getByRole('button',{name:'Import files with AI',exact:true}).click();
+ page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'Start a blank skill',exact:true}).click();await page.getByRole('button',{name:'Import files with AI',exact:true}).click();
  await mkdir(evidence+'/upload-fixture/scripts',{recursive:true});
  const scriptText='print("Synthetic fixture; do not execute during import")';
  await writeFile(evidence+'/upload-fixture/SKILL.md','Describe this synthetic workflow.');await writeFile(evidence+'/upload-fixture/scripts/check.py',scriptText);await writeFile(evidence+'/upload-fixture/.env','FIXTURE_ONLY=excluded');
@@ -171,7 +173,7 @@ try {
  assert.deepEqual(errors,[]);pass('revocation rejects helper access; no browser page errors');
  // Direct Markdown and editing must work with no hosted or personal AI key.
  let unexpectedAI=0;await page.route('**/api/generate',async route=>{unexpectedAI++;await route.abort();});
- await page.getByRole('button',{name:'Creator studio',exact:true}).click();await page.getByRole('button',{name:'New skill',exact:true}).click();await page.getByRole('button',{name:'Upload / edit Markdown',exact:true}).click();
+ await page.getByRole('button',{name:'Creator studio',exact:true}).click();page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'Start a blank skill',exact:true}).click();await page.getByRole('button',{name:'Upload / edit Markdown',exact:true}).click();
  pass('manual Markdown editor opened');
  const manualContent=content+'\n\n<!-- '+('large Markdown fixture '.repeat(5000))+' -->';
  await page.getByLabel('Import a Markdown file',{exact:false}).setInputFiles({name:'workflow.MD',mimeType:'text/markdown',buffer:Buffer.from(manualContent)});
@@ -189,7 +191,7 @@ try {
  await page.getByRole('alert').filter({hasText:'must use UTF-8'}).waitFor();assert.equal(await page.getByLabel('Skill instructions').inputValue(),editedContent);
  await page.getByLabel('Import a Markdown file',{exact:false}).setInputFiles({name:'oversized.md',mimeType:'text/markdown',buffer:Buffer.alloc(300001,65)});
  await page.getByRole('alert').filter({hasText:'300 KB'}).waitFor();assert.equal(await page.getByLabel('Skill instructions').inputValue(),editedContent);
- await page.getByLabel('Skill instructions').fill('   ');await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('alert').filter({hasText:'Skill instructions must not be empty'}).waitFor();
+ await page.getByLabel('Skill instructions').fill('   ');await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('alert').filter({hasText:'Complete your draft: Skill instructions'}).waitFor();
  assert.equal((await db.query('SELECT content FROM versions WHERE title=$1',['Manual Markdown fixture'])).rows[0].content,editedContent);
  await page.getByLabel('Skill instructions').fill(editedContent);await page.getByRole('button',{name:'Save draft',exact:true}).click();await page.getByRole('status').filter({hasText:'Draft saved'}).waitFor();
  pass('failed encoding/oversize uploads preserve editor; invalid draft cannot change a release; retry succeeds');
@@ -201,7 +203,7 @@ try {
  await page.getByRole('button',{name:'Close details',exact:true}).click();pass('creator restore and explicit earlier-version retrieval preserve content');
  // Custom-heading Markdown publishes unchanged; optional adaptation needs explicit consent and review.
  const nativeContent=process.env.NATIVE_SKILL_FIXTURE?await readFile(process.env.NATIVE_SKILL_FIXTURE,'utf8'):'---\nname: native-workflow\ndescription: Inspect example inputs with explicit settings and reproducible outputs.\n---\n\n# Native workflow\n\n## First interaction\nAsk which inputs to inspect. Preserve raw inputs and record decisions and limitations before reporting results.\n';
- await page.getByRole('button',{name:'Creator studio',exact:true}).click();await page.getByRole('button',{name:'New skill',exact:true}).click();await page.getByRole('button',{name:'Upload / edit Markdown',exact:true}).click();
+ await page.getByRole('button',{name:'Creator studio',exact:true}).click();page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'Start a blank skill',exact:true}).click();await page.getByRole('button',{name:'Upload / edit Markdown',exact:true}).click();
  await page.getByLabel('Import a Markdown file',{exact:false}).setInputFiles({name:'SKILL.md',mimeType:'text/markdown',buffer:Buffer.from(nativeContent)});
  await page.getByLabel('Adapt to BioSkillsHub’s suggested structure with AI',{exact:true}).waitFor();assert.equal(await page.getByLabel('Adapt to BioSkillsHub’s suggested structure with AI',{exact:true}).isChecked(),false);
  assert.ok((await page.getByLabel('Skill title',{exact:true}).inputValue()).length>0);assert.ok((await page.getByLabel('Short description').inputValue()).length>0);
@@ -215,7 +217,7 @@ try {
  await page.getByLabel('Adapt to BioSkillsHub’s suggested structure with AI',{exact:true}).uncheck();assert.equal(await page.getByRole('button',{name:'Analyse files with AI',exact:true}).count(),0);
  pass('custom-heading Markdown publishes unchanged without AI; optional adaptation defaults off');
  await page.getByRole('button',{name:'AI settings',exact:true}).click();await page.getByLabel('OpenAI API key',{exact:true}).fill(dummyKey);await page.getByRole('checkbox').check();await page.getByRole('button',{name:'Enable personal key',exact:true}).click();
- await page.getByRole('button',{name:'Creator studio',exact:true}).click();await page.getByRole('button',{name:'New skill',exact:true}).click();await page.getByLabel('Import a Markdown file',{exact:false}).setInputFiles({name:'SKILL.md',mimeType:'text/markdown',buffer:Buffer.from(nativeContent)});
+ await page.getByRole('button',{name:'Creator studio',exact:true}).click();page.once('dialog',dialog=>dialog.accept());await page.getByRole('button',{name:'Start a blank skill',exact:true}).click();await page.getByLabel('Import a Markdown file',{exact:false}).setInputFiles({name:'SKILL.md',mimeType:'text/markdown',buffer:Buffer.from(nativeContent)});
  await page.getByLabel('Adapt to BioSkillsHub’s suggested structure with AI',{exact:true}).check();
  let conversionCalls=0;
  await page.route('**/api/skill-import',async route=>{conversionCalls++;const body=route.request().postDataJSON();assert.equal(body.confirmed,true);assert.equal(body.files[0].content,nativeContent);if(conversionCalls===1){await route.fulfill({status:502,json:{error:'Conversion fixture failure'}});return;}await route.fulfill({json:{message:'Synthetic conversion; review before publishing.',draft:{title:'Converted workflow fixture',summary:'Synthetic conversion result for testing the schema and review workflow.',domain:'Imaging',content}}});});
@@ -239,6 +241,8 @@ try {
 
  await db.query("UPDATE sessions SET expires_at=now()-interval '1 second' WHERE user_id='efe'");await page.reload();await page.waitForURL(origin+'/#sign-in');await page.getByRole('heading',{name:/Turn experience/}).waitFor();
  assert.equal(await page.getByRole('button',{name:'Creator studio',exact:true}).count(),0);assert.deepEqual(errors,[]);pass('expired session returns to public landing without cached workspace');
+ }
+ await mobileCreatorRegression({browser,origin,password:passwords.wojtek,db,evidence});pass('mobile dialog, price, Other domain, actionable save errors, recovery and publication');
  await writeFile(evidence+'/result.json',JSON.stringify({time:new Date().toISOString(),scope:'Disposable schema in Wojtek database; synthetic software only',steps},null,2),{mode:0o600});
 } catch(e) {console.error('Rehearsal failed:',e.name,'after',steps.at(-1)||'startup','(details suppressed to protect credentials)');process.exitCode=1;}
 finally {
