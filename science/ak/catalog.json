@@ -1,6 +1,6 @@
 [
   {
-    "id": "aleksy-ml-chemical-reaction-prediction",
+    "id": "ak-ml-chemical-reaction-prediction",
     "title": "ML for Chemical Reaction Prediction",
     "summary": "A practitioner workflow covering molecular representations, featurisation, data hygiene, leakage, evaluation and interpretable reaction predictions.",
     "domain": "Chemistry",

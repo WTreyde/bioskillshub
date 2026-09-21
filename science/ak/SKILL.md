@@ -1,10 +1,10 @@
 ---
-name: aleksy-ml-chemical-reaction-prediction
+name: ak-ml-chemical-reaction-prediction
 description: Practitioner guidance for chemical reaction prediction with machine learning.
 ---
 # ML for Chemical Reaction Prediction
 
-Attributed to Aleksy Kwiatkowski at the uploader's request. The original attachment is preserved below. Contributor-provided guidance; scientific review pending. No models or performance claims were validated during import.
+Attributed to ak at the uploader's request. The original attachment is preserved below. Contributor-provided guidance; scientific review pending. No models or performance claims were validated during import.
 
 ## Use cases
 Plan or review an ML workflow for predicting reaction outcomes using the contributor's practitioner notes.

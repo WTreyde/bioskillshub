@@ -76,9 +76,9 @@ Typecheck, production build, PostgreSQL ownership/import/access tests and all si
 
 ## Contributor attachment and AI file import
 
-Prepared the user-supplied reaction-prediction workflow under Aleksy Kwiatkowski, preserving the original file and verifying its SHA-256. Added Creator studio file/folder selection, local preview/removal, explicit sharing consent and AI conversion to reviewable skill drafts. Scripts are never executed; source text is appended unchanged to the Markdown skill. Input size/path/type checks and existing ownership/review gates apply. Model behavior is tested with fixtures, not paid live calls. Deployment and the separate Aleksy import remain administrator actions.
+Prepared the user-supplied reaction-prediction workflow under ak, preserving the original file and verifying its SHA-256. Added Creator studio file/folder selection, local preview/removal, explicit sharing consent and AI conversion to reviewable skill drafts. Scripts are never executed; source text is appended unchanged to the Markdown skill. Input size/path/type checks and existing ownership/review gates apply. Model behavior is tested with fixtures, not paid live calls. Deployment and the separate ak import remain administrator actions.
 
-All required checks passed: TypeScript, production build, PostgreSQL ownership/import/provider/access tests, sixteen Python tests and Chromium desktop/mobile rehearsal. Browser checks exercised both file and folder selection, private-file exclusion, explicit sharing consent, source retention and review-gated saving. Aleksy's skill was imported into Wojtek's database and repeat import detection passed. Public deployment/import remains pending; no paid live-model verification was performed.
+All required checks passed: TypeScript, production build, PostgreSQL ownership/import/provider/access tests, sixteen Python tests and Chromium desktop/mobile rehearsal. Browser checks exercised both file and folder selection, private-file exclusion, explicit sharing consent, source retention and review-gated saving. ak's skill was imported into Wojtek's database and repeat import detection passed. Public deployment/import remains pending; no paid live-model verification was performed.
 
 ## Public introduction, artwork and domain expansion
 
