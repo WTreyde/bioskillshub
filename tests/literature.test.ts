@@ -71,11 +71,11 @@ test('literature import is attributed, atomic, repeatable and preserves existing
   const listed=(await catalog('')).find(s=>s.id===anthropic.id);assert.ok(listed);assert.equal(listed.author,'Anthropic');assert.equal(listed.owner_id,'anthropic');
   await assert.rejects(retrieve('curator',anthropic.id,1));await acquire('curator',anthropic.id);
   assert.equal((await retrieve('curator',anthropic.id,1)).content,anthropic.content);
-  const {loadak,seedak}=await import('../lib/ak');const [ak]=await loadak();
+  const {loadAk,seedAk}=await import('../lib/ak');const [ak]=await loadAk();
   const original=await readFile('science/ak/original.md','utf8');assert.ok(ak.content.endsWith(original));
-  assert.equal((await seedak())[0].status,'would-insert');assert.equal((await query("SELECT id FROM users WHERE id='ak'")).length,0);
-  assert.equal((await seedak(true))[0].status,'inserted');const ownerBefore=await query("SELECT * FROM users WHERE id='ak'");
-  assert.equal((await seedak(true))[0].status,'existing');assert.deepEqual(await query("SELECT * FROM users WHERE id='ak'"),ownerBefore);
+  assert.equal((await seedAk())[0].status,'would-insert');assert.equal((await query("SELECT id FROM users WHERE id='ak'")).length,0);
+  assert.equal((await seedAk(true))[0].status,'inserted');const ownerBefore=await query("SELECT * FROM users WHERE id='ak'");
+  assert.equal((await seedAk(true))[0].status,'existing');assert.deepEqual(await query("SELECT * FROM users WHERE id='ak'"),ownerBefore);
   assert.equal((await catalog('')).find(s=>s.id===ak.id)?.author,'ak');
   await acquire('curator',ak.id);assert.ok((await retrieve('curator',ak.id,1)).content.endsWith(original));
   await assert.rejects(query('UPDATE versions SET content=$1 WHERE skill_id=$2',['tampered',entries[0].id]),/immutable/);
