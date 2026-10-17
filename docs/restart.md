@@ -6,7 +6,7 @@ The public [GitHub Pages showcase](https://wtreyde.github.io/bioskillshub/) is a
 
 The platform needs a CPU host, Docker Compose and PostgreSQL 17. No GPU or scientific execution environment is required. The abandoned experimental case-study package has been removed; the BioNeMo catalogue skills remain ordinary platform content.
 
-The September 2026 website remains on its existing temporary Cloudflare URL until NVIDIA retires the CPU host. Do not stop the tunnel or change live OAuth credentials during closeout. The old temporary URL cannot be relied on after restart. Prefer a stable HTTPS domain for a future public deployment.
+The original Brev CPU deployment and its temporary Cloudflare URL have been retired. The GitHub Pages showcase is the only currently hosted site, and it is static. To run the working application again, restore it on a new CPU host using the steps below and configure a stable HTTPS domain rather than relying on the old temporary URL.
 
 ## What to keep
 
@@ -15,7 +15,7 @@ The September 2026 website remains on its existing temporary Cloudflare URL unti
 - A separate private copy of the integration `.env`, plus any operational account passwords you need. Never place them in Git or paste them into chat. PostgreSQL dumps do not include `.env`, the OAuth client secret or the database role password.
 - Optionally, a built app image for exact runtime reproduction. Docker base-image tags can change; a Git commit and lockfile do not freeze the operating-system image.
 
-On the original coordinator laptop, private closeout backups are under `.local/backups/closeout-20260920/` in the repository checkout. Verify the manifest there. Those files are intentionally ignored by Git. Losing that laptop without another private copy loses the backup.
+The original closeout process used `.local/backups/closeout-20260920/` in the repository checkout, but that local scratch directory may have since been removed. Before attempting a real restore, locate a private database dump and its matching checksum and recovery-verification record. GitHub contains no copy of the real database; without a valid dump, the live accounts and uploaded catalogue cannot be restored.
 
 **Do not upload the real dump to GitHub, even a private repository.** It includes account/password hashes, session/token records, OAuth state and unpublished content. GitHub can host code and reviewed synthetic seed data. An encrypted offsite backup is a separate option; keep the decryption key outside the backup service and repository. `.gitignore` is an accident-prevention measure, not secret scanning or encryption.
 
