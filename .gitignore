@@ -1,16 +1,30 @@
+# Dependencies and generated application output
 node_modules/
 .next/
+out/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Local configuration, credentials and operational data
 .env
 .env.*
 !.env.example
 .local/
-*.tsbuildinfo
-__pycache__/
-.venv/
+backups/
+*.dump
+*.backup
+
+# Private or generated scientific data
 results/
 data/private/
 
-# Private database exports; use .local/backups/ even for encrypted archives.
-*.dump
-*.backup
-backups/
+# Python and editor/OS artifacts
+.venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+*.log
+*.tmp
+*.bak

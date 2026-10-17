@@ -15,7 +15,7 @@ The original Brev CPU deployment and its temporary Cloudflare URL have been reti
 - A separate private copy of the integration `.env`, plus any operational account passwords you need. Never place them in Git or paste them into chat. PostgreSQL dumps do not include `.env`, the OAuth client secret or the database role password.
 - Optionally, a built app image for exact runtime reproduction. Docker base-image tags can change; a Git commit and lockfile do not freeze the operating-system image.
 
-The original closeout process used `.local/backups/closeout-20260920/` in the repository checkout, but that local scratch directory may have since been removed. Before attempting a real restore, locate a private database dump and its matching checksum and recovery-verification record. GitHub contains no copy of the real database; without a valid dump, the live accounts and uploaded catalogue cannot be restored.
+Before attempting a real restore, locate a private database dump and its matching checksum and recovery-verification record. Do not assume that any particular local backup path exists or that a dump is valid without its verification record. GitHub contains no copy of the real database; without a valid dump, the live accounts and uploaded catalogue cannot be restored.
 
 **Do not upload the real dump to GitHub, even a private repository.** It includes account/password hashes, session/token records, OAuth state and unpublished content. GitHub can host code and reviewed synthetic seed data. An encrypted offsite backup is a separate option; keep the decryption key outside the backup service and repository. `.gitignore` is an accident-prevention measure, not secret scanning or encryption.
 
@@ -102,7 +102,7 @@ The UI uses GitHub sign-in. A restored database alone does not configure OAuth. 
 
 - Homepage: the new exact app origin.
 - Callback: `<APP_ORIGIN>/api/auth/github/callback`.
-- `GITHUB_ALLOW_SIGNUP=true` for open registration, or the reviewed team mapping/closed-registration settings described in [GitHub sign-in](github-sign-in.md).
+- `GITHUB_ALLOW_SIGNUP=true` to permit registration. Keep the app's callback URL aligned with the exact origin.
 
 For localhost, use `http://localhost:3000/api/auth/github/callback`. For public use, establish HTTPS, set `APP_ORIGIN` to that exact origin and `COOKIE_SECURE=true`, update the OAuth callback, then run `docker compose up -d --force-recreate app`. Updating `.env` without recreating the app does not change its environment.
 
@@ -112,7 +112,7 @@ The app and database bind to loopback. Use SSH forwarding for private access (`s
 
 - `/api/health`, `/`, `/about` and `/browse` respond successfully.
 - Fresh GitHub sign-in opens `/workspace`; the brand returns home.
-- Catalogue, creator contributions, versions, acquired library and hidden flags survived restore. The two hidden deployment-verification entries should remain hidden.
+- Catalogue entries, creator contributions, versions, acquired library and visibility settings survived restore.
 - Download an existing acquired version and its Agent Skills ZIP; verify its recorded hash. Check unauthorized retrieval is rejected.
 - Use a disposable test environment for draft/save/publish, ratings and recovery regression tests; do not add test reviews to real skills.
 - Verify no API keys or tokens are printed, stored in Git or embedded in screenshots.
@@ -132,8 +132,8 @@ docker compose run --rm --no-deps --user "$(id -u):$(id -g)" \
 docker compose up -d app
 ```
 
-The setup writes the four new account passwords privately into host `.local/` and seeds two prototype skills. Configure GitHub OAuth separately for browser login. Optional catalogue importers have dry-run/apply workflows in their collection READMEs. The 33 BioNeMo contributions and other user uploads are database content: a code clone or default setup does not recreate them. Restore the private database to recover the real catalogue. Synthetic ratings/eval badges are optional, clearly labelled demo content; never seed them as real evidence.
+The setup writes new account passwords privately into host `.local/` and seeds prototype skills. Configure GitHub OAuth separately for browser login. Optional catalogue importers have dry-run/apply workflows in their collection READMEs. User uploads are database content: a code clone or default setup does not recreate them. Restore the private database to recover the catalogue. Synthetic ratings/eval badges are optional, clearly labelled demo content; never seed them as real evidence.
 
 ## When reopening publicly later
 
-Run the repository checks on a disposable database, update dependencies with tests, and recheck OAuth and data-sharing settings before reopening. This is a tested hackathon prototype, not a security certification or a verified scientific execution service. Use a stable origin, routine encrypted backups, cost controls and a defined data-retention policy for continued operation.
+Run the repository checks on a disposable database, update dependencies with tests, and recheck OAuth and data-sharing settings before reopening. This prototype is not a security certification or a verified scientific execution service. Use a stable origin, routine encrypted backups, cost controls and a defined data-retention policy for continued operation.

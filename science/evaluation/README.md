@@ -1,13 +1,7 @@
-# Frozen evaluation contract
+# Paired scientific workflow evaluation
 
-Use two conditions: baseline and expert_skill. Same model/runtime version, input files, tools, compute, task prompt, time limit and existing tool instructions. Use fresh contexts and record seeds where supported. BioNeMo skills stay available in both ADMET conditions. Do not tune expert instructions on held-out evaluation outputs.
+These utilities support future, expert-reviewed evaluations; they do not run a scientific tool or validate a skill by themselves. The original hackathon comparison study has been retired. No current evaluation result or improvement claim is supplied.
 
-Before running, domain owners freeze the reference dataset, allowed exclusions, output metrics and acceptance tolerances. ImageJ: segmentation agreement and per-nucleus count error with overlays, not merely successful execution. ADMET: input preparation, correct endpoint/units/output alignment and task completion; predictive metrics only when reference labels support them. Avoid treating correlated nuclei as independent replicates.
+Use the same model/runtime, input files, tools, task prompt, compute and time limit across baseline and skill-assisted conditions. Freeze the reference data, exclusions, metrics and acceptance tolerances before running. Keep failures and human interventions. For microscopy, preserve biological replicate structure and use overlays plus reference agreement, not just successful execution. For molecular predictions, use a documented endpoint and reference labels before calculating predictive metrics.
 
-Copy run.example.json per run into a private results directory. Retain unsuccessful runs, stderr (after credential redaction), outputs, input/checkpoint/skill hashes and agent tool-call counts. Measure total wall time consistently, distinguish setup from inference, and document any human intervention. Run repeated paired trials when time permits; otherwise label the comparison exploratory and avoid generalised accuracy claims.
-
-Scientific owners must sign off the references and acceptance thresholds. The platform's seed validation labels remain pending until then.
-
-Use `compare.py BASELINE.json EXPERT.json --output PRIVATE_COMPARISON.json` to check paired settings and report recorded timing/metric differences while retaining failures. It does not establish significance or scientific validity. See [artifact intake](../../docs/scientific-intake.md).
-
-## BioNeMo backbone-audit case study
+Copy `run.example.json` into a private results folder for each run. Keep private inputs, outputs and credentials outside Git. `compare.py` checks paired settings and reports raw differences; it does not establish significance, scientific validity or a generalized improvement. Do not treat synthetic fixtures as scientific evidence.
