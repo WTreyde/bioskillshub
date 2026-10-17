@@ -27,7 +27,7 @@ For the containerised app: `docker compose up -d --build`. Initialise a new data
 
 ## GitHub sign-in and upgrades
 
-Any GitHub account can join once an administrator creates an OAuth App and privately configures `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` and `GITHUB_ALLOW_SIGNUP=true`. The public sign-in page offers GitHub only; existing team credentials and the legacy API are preserved for operational compatibility. See [OAuth activation and identity mapping](docs/github-sign-in.md). GitHub sign-in was verified on the hackathon deployment. Every new origin still needs its own callback configuration and live sign-in check.
+GitHub sign-in requires an OAuth App configured for the exact app origin. Configure its client ID and secret privately and verify sign-in on every new deployment. The GitHub Pages showcase does not use OAuth. See the [restart guide](docs/restart.md) before enabling sign-in on a restored app.
 
 For an existing database, back up first, run `npm run db:migrate` to apply the additive schema changes, and restart the app. This preserves accounts, credentials and releases.
 
@@ -56,12 +56,10 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
 - [Architecture and API](docs/architecture.md)
-- [Local development and contribution](docs/setup.md)
-- [Implementation status and external gates](docs/status.md)
-- [Original hackathon contributors](docs/team/README.md)
+- [Current project status](docs/status.md)
 - [Retired service and private data](docs/operations.md)
-- [Scientific artifact intake](docs/scientific-intake.md)
-- [Scientific evaluation contract](science/evaluation/README.md)
+- [Application architecture](docs/architecture.md)
+- [Skill usage](docs/using-skills.md)
 
 ImageJ statistical utilities are runnable; real scientific validation requires Leandre's reference data. ADMET preflight deliberately rejects the placeholder manifest until a usable endpoint checkpoint is documented. These are not validated scientific demonstrations yet.
 
@@ -87,7 +85,7 @@ Creator studio also supports **Import files with AI** for a single UTF-8 source 
 
 The attached chemical reaction prediction workflow is available as a free contributor skill owned by ak; [import instructions](science/ak/README.md) preserve the original attachment and existing credentials.
 
-For a bounded synthetic HTTP/concurrency audit, build first and run `npm run test:load` against a local disposable test configuration. It refuses an occupied app port, creates/cleans its own schema, runs finite scenarios and verifies restart persistence. Set `REHEARSAL_DB_PORT` if your local test database is not on 5442. Never point it at production. See [audit coverage and findings](docs/qa/overnight-audit.md).
+For a bounded synthetic HTTP/concurrency audit, build first and run `npm run test:load` against a local disposable test configuration. It refuses an occupied app port, creates/cleans its own schema, runs finite scenarios and verifies restart persistence. Set `REHEARSAL_DB_PORT` if your local test database is not on 5442. Never point it at production.
 
 
 ## Agent Skills and community feedback
@@ -95,5 +93,3 @@ For a bounded synthetic HTTP/concurrency audit, build first and run `npm run tes
 Publishing checks [Agent Skills metadata](https://agentskills.io/specification); manual bodies keep their headings. Creator studio can add metadata without AI or convert uploads with explicit-consent AI. Acquired versions include an Agent Skills ZIP download. Existing immutable release content/hashes are preserved.
 
 Acquired-skill users can rate 1–5 stars; each account has one editable vote and creators cannot rate their own skills. Synthetic demo ratings are separate. Eval badges distinguish creator-reported passes from demo-only indicators; no eval harness runs in this app.
-
-Upgrade handoff: back up, run `npm run db:migrate`, rebuild/restart, then review `npm run db:seed-demo-feedback` and use `npm run db:seed-demo-feedback -- --apply` to populate labelled samples for existing skills. This seeds no real reviews or verified eval results. The integration administrator owns these actions.

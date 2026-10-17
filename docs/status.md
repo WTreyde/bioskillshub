@@ -9,10 +9,10 @@ The repository still contains the complete Next.js, TypeScript and PostgreSQL ap
 - A local-only showcase of Explore, My library, Creator studio, Connect agent and AI settings. Its listings and interactions are illustrative; acquisition, editing and publication are browser-local demos.
 - The full application source, database schema, migration/setup scripts, tests and Docker Compose configuration.
 - Public scientific catalogue examples, including the BioNeMo-associated skills. They remain sample instructions with their stated validation limits.
-- Generic ImageJ and ADMET prototypes and scientific preflight/evaluation utilities. The team demonstrated that Leandre’s ImageJ skill improved its image-analysis workflow. This repository does not contain a numerical benchmark claim, and no scientific comparison is currently running.
+- Generic ImageJ and ADMET prototype content and scientific utilities. The team demonstrated that Leandre’s ImageJ skill improved its image-analysis workflow. This repository does not contain a numerical benchmark claim, and no scientific comparison is currently running.
 
 ## Verification boundaries
 
-The historical hackathon and deployment checks are preserved under `docs/qa/` for provenance. They do not establish that the retired service is currently available. No current live authentication, database, OpenAI, Rosalind, NVIDIA NIM or scientific execution service is provided by this repository. Validate a fresh deployment and any scientific workflow independently before relying on it.
+No current live authentication, database, OpenAI, Rosalind, NVIDIA NIM or scientific execution service is provided by this repository. Validate a fresh deployment and any scientific workflow independently before relying on it.
 
 For the static site, use the GitHub Pages workflow and the repository's Actions status. For the full service, use the disposable-database checks documented in `README.md` and `AGENTS.md`.

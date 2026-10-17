@@ -8,7 +8,14 @@ The Brev CPU and GPU instances and the temporary Cloudflare URL have been retire
 
 Private database backups, checksums, restore records, environment files and account credentials are local operational data, not source files. Keep them outside Git and outside any unencrypted/shared sync folder. `.gitignore` is not an encryption or cloud-sync boundary. Preserve at least one verified backup until you have confirmed whether the old catalogue data is still needed; a code clone cannot reconstruct it.
 
-If the GitHub OAuth App was used only for the retired full application, confirm that no other service depends on it, then remove its old callback or retire the app in GitHub settings. GitHub Pages does not need this OAuth app.
+GitHub Pages does not need the BioSkillsHub OAuth App. If you have confirmed that no other service uses it, delete the registration:
+
+1. Sign in to the GitHub account that owns the app.
+2. Open **Settings → Developer settings → OAuth Apps**, then select the BioSkillsHub app.
+3. Open **Advanced → Delete application**.
+4. Review the app name, then choose **Delete this OAuth Application** to confirm.
+
+Deleting the app stops OAuth login for every service configured with that app. If you are unsure whether another service uses it, first remove the retired BioSkillsHub callback in **OAuth Apps → BioSkillsHub → Update application**, and leave the registration intact until dependencies are checked. GitHub's [OAuth App deletion guide](https://docs.github.com/en/apps/oauth-apps/maintaining-oauth-apps/deleting-an-oauth-app) has the current controls. After retirement, remove obsolete `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` copies from private configuration stores; never paste or commit them.
 
 ## Restore
 

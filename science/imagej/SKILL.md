@@ -30,4 +30,4 @@ Request threshold strategy, background subtraction, minimum nuclear area and uni
 No reference dataset or expert-approved parameters have yet been supplied. The generic macro does not establish biological accuracy. It is limited to 2D aligned images and peak counting; it is unsuitable for unreviewed 3D, overlapping foci or heterogeneous staining. No hypothesis test is selected by this prototype.
 
 ## Examples
-First read docs/team/leandre.md and request the missing protocol information. Use science/imagej/config.synthetic.json only with generated synthetic fixtures. For real data, write a separate reviewed configuration and validate on Leandre's annotated images before making scientific claims.
+Use `science/imagej/config.synthetic.json` only with generated synthetic fixtures. For real data, follow the domain expert's reviewed protocol, create a separate reviewed configuration and validate on annotated reference images before making scientific claims.

@@ -20,4 +20,4 @@ Run `npm run typecheck`, `npm run build`, `npm test` against a disposable Postgr
 
 ## Current state
 
-The current deployment and remaining limitations are recorded in `docs/status.md`. Recovery steps are in `docs/restart.md`; `docs/operations.md` describes retired-service cleanup and backup handling. Old hackathon audit records are historical evidence, not active deployment instructions.
+The current deployment and remaining limitations are recorded in `docs/status.md`. Recovery steps are in `docs/restart.md`; `docs/operations.md` describes retired-service cleanup and backup handling.

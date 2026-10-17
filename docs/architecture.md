@@ -10,7 +10,7 @@ Public catalogue metadata includes title, summary, domain, author, price and cre
 
 ## HTTP contract
 
-API responses use JSON except downloadable source/ZIP attachments; all use `Cache-Control: no-store`. Errors use `{error: string}`. Browser mutations require `Origin` matching `APP_ORIGIN`. Session cookies are HttpOnly, SameSite Strict, expire after 12 hours and can be made Secure for HTTPS with COOKIE_SECURE=true. Team localhost SSH tunnels use false.
+API responses use JSON except downloadable source/ZIP attachments; all use `Cache-Control: no-store`. Errors use `{error: string}`. Browser mutations require `Origin` matching `APP_ORIGIN`. Session cookies are HttpOnly, SameSite Strict, expire after 12 hours and can be made Secure for HTTPS with `COOKIE_SECURE=true`. Local HTTP origins use false.
 
 | Method / endpoint | Contract |
 |---|---|
@@ -51,7 +51,7 @@ Tokens use 256-bit random values and SHA-256 hashes. Passwords use salted scrypt
 
 Keep this HTTP contract stable. Ask the OpenAI mentor for the supported skill install/connector surface and model identifier. Run list → retrieve pinned version → execute a harmless fixture → record output provenance. Do not infer verified Rosalind compatibility from Codex success alone.
 
-GitHub identities are keyed by stable numeric provider ID, never email or mutable login. `oauth_states` contains ten-minute, browser-bound authorization attempts. GitHub tokens are not persisted. See [OAuth activation](github-sign-in.md). The retired deployment no longer provides a live OAuth endpoint; verify every new origin before describing sign-in as working.
+GitHub identities are keyed by stable numeric provider ID, never email or mutable login. `oauth_states` contains ten-minute, browser-bound authorization attempts. GitHub tokens are not persisted. See the [restart guide](restart.md) for OAuth configuration. The retired deployment has no live OAuth endpoint; verify every new origin before describing sign-in as working.
 
 ## Personal AI and acquired-skill handoff
 
