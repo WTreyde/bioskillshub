@@ -1,6 +1,6 @@
 # BioSkillsHub
 
-**[Open the static showcase](https://wtreyde.github.io/bioskillshub/)** — a public introduction to the project, not a live marketplace. GitHub Pages serves static files only; sign-in, live catalogue data, authoring, acquisition and agent retrieval require the full app and PostgreSQL. See [how to run or restore the working platform](docs/restart.md).
+**[Open the static showcase](https://wtreyde.github.io/bioskillshub/)** — a public introduction with an interactive mock marketplace, not a live service. Its example listings, filters and tab-only demo library do not use real catalogue data, accept purchases or download skills. GitHub Pages serves static files only; sign-in, live catalogue data, authoring, acquisition and agent retrieval require the full app and PostgreSQL. See [how to run or restore the working platform](docs/restart.md).
 
 The showcase is published from `showcase/` by the GitHub Actions workflow in `.github/workflows/pages.yml`. It contains no live user or catalogue database content. To run the complete application locally or restore it on a new host, follow [docs/restart.md](docs/restart.md).
 
