@@ -1,3 +1,5 @@
+> Historical QA record from the September 2026 hackathon. It documents past checks and deployments; it is not a current operating procedure. See [current status](../status.md) and [restart guidance](../restart.md).
+
 # Platform closeout review — 20 September 2026
 
 Reviewed the PR #19 platform baseline (`6565d91`) and the closeout documentation/removal change. No application behavior or production credentials were changed for closeout.

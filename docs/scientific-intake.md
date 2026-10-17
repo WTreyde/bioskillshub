@@ -1,6 +1,6 @@
 # Scientific artifact intake
 
-The platform and software checks can be completed without scientific data. Domain-specific protocols, permissions, reference labels and interpretations require their owners' evidence. Do not fill these gaps with invented parameters or surrogate predictions.
+This document is optional guidance for future scientific validation. No comparison study is currently active. Platform/software checks do not validate scientific methods; domain-specific protocols, permissions, reference labels and interpretations require evidence from qualified owners. Do not fill gaps with invented parameters or surrogate predictions.
 
 ## ImageJ handoff
 
@@ -13,7 +13,7 @@ Copy `science/imagej/dataset.example.json` into a private data directory. Fill i
 
 Run `python3 science/imagej/preflight.py PRIVATE_MANIFEST.json`. It verifies provenance fields/hashes and split separation, not microscopy accuracy. The actual runner remains a prototype until Leandre's method and parameters are reviewed. Do not change the seeded validation badge merely because preflight passes.
 
-## ADMET mentor handoff
+## ADMET evidence requirements
 
 Copy `science/admet/endpoint.example.json` into a private directory and request the following as one concrete package:
 
@@ -26,7 +26,7 @@ Copy `science/admet/endpoint.example.json` into a private directory and request 
 | Reference outputs | Known expected output for those IDs and numerical/class tolerances |
 | Reviewer | Mentor/domain owner who approved the package and scope |
 
-Run `python3 science/admet/preflight.py PRIVATE_MANIFEST.json`. General pretrained weights are rejected as an endpoint predictor. Passing provenance checks does not verify numerical predictions. Plan a GPU only after the complete package, measured price and bounded execution estimate are available. Keep existing BioNeMo instructions in both comparison conditions.
+Run `python3 science/admet/preflight.py PRIVATE_MANIFEST.json`. General pretrained weights are rejected as an endpoint predictor. Passing provenance checks does not verify numerical predictions. Do not run predictions until the endpoint, model provenance, reference data and review are complete. These requirements apply to any future execution host.
 
 ## Paired evaluation
 

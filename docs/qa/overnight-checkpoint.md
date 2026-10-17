@@ -1,3 +1,5 @@
+> Historical QA record from the September 2026 hackathon. It documents past checks and deployments; it is not a current operating procedure. See [current status](../status.md) and [restart guidance](../restart.md).
+
 # Overnight audit checkpoint
 
 Status: local audit complete; awaiting final PR CI and integration. No Codex Cloud task was created.

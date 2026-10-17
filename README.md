@@ -56,12 +56,10 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
 - [Architecture and API](docs/architecture.md)
-- [Remote workspace setup](docs/setup.md)
+- [Local development and contribution](docs/setup.md)
 - [Implementation status and external gates](docs/status.md)
-- [Efe](docs/team/efe.md), [Leandre](docs/team/leandre.md), [Maxim](docs/team/maxim.md), [Wojtek](docs/team/wojtek.md)
-- [Pitch and rehearsal](docs/pitch.md)
-- [Readiness ledger and remaining gates](docs/readiness.md)
-- [Recovery, access and shutdown](docs/operations.md)
+- [Original hackathon contributors](docs/team/README.md)
+- [Retired service and private data](docs/operations.md)
 - [Scientific artifact intake](docs/scientific-intake.md)
 - [Scientific evaluation contract](science/evaluation/README.md)
 

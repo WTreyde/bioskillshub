@@ -15,7 +15,7 @@ The original Brev CPU deployment and its temporary Cloudflare URL have been reti
 - A separate private copy of the integration `.env`, plus any operational account passwords you need. Never place them in Git or paste them into chat. PostgreSQL dumps do not include `.env`, the OAuth client secret or the database role password.
 - Optionally, a built app image for exact runtime reproduction. Docker base-image tags can change; a Git commit and lockfile do not freeze the operating-system image.
 
-The original closeout process used `.local/backups/closeout-20260920/` in the repository checkout, but that local scratch directory may have since been removed. Before attempting a real restore, locate a private database dump and its matching checksum and recovery-verification record. GitHub contains no copy of the real database; without a valid dump, the live accounts and uploaded catalogue cannot be restored.
+Before attempting a real restore, locate a private database dump and its matching checksum and recovery-verification record. Do not assume that any particular local backup path exists or that a dump is valid without its verification record. GitHub contains no copy of the real database; without a valid dump, the live accounts and uploaded catalogue cannot be restored.
 
 **Do not upload the real dump to GitHub, even a private repository.** It includes account/password hashes, session/token records, OAuth state and unpublished content. GitHub can host code and reviewed synthetic seed data. An encrypted offsite backup is a separate option; keep the decryption key outside the backup service and repository. `.gitignore` is an accident-prevention measure, not secret scanning or encryption.
 

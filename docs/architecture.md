@@ -4,7 +4,7 @@
 
 Next.js serves a client-side React catalogue and Node route handlers. PostgreSQL is the source of truth for accounts, sessions, skills, drafts, immutable versions, entitlements, token hashes, request counters and AI usage. No instruction execution occurs inside the web app. The scientist's agent retrieves text and runs tools in a separate environment.
 
-The initial deployment is localhost/private through SSH. Published metadata is available anonymously at `/browse` and `/api/public/catalog`; login and acquisition protect instruction content. GitHub OAuth supports open registration when configured; four seeded accounts retain password login. This is a hackathon service, not a production multi-tenant execution platform.
+In the original deployment, the full application was private behind SSH while published metadata was available anonymously at `/browse` and `/api/public/catalog`; login and acquisition protected instruction content. GitHub OAuth and four seeded accounts were supported. The current GitHub Pages site is static; any future full deployment must configure and verify its own origin and authentication. This remains a prototype, not a production multi-tenant execution platform.
 
 Public catalogue metadata includes title, summary, domain, author, price and creator-reported validation status. Recommendation calls include only this metadata plus the user's question. Guided generation sends the submitted expert answers to OpenAI; no generation starts automatically. No full purchased instructions are sent to the recommender.
 
@@ -51,7 +51,7 @@ Tokens use 256-bit random values and SHA-256 hashes. Passwords use salted scrypt
 
 Keep this HTTP contract stable. Ask the OpenAI mentor for the supported skill install/connector surface and model identifier. Run list → retrieve pinned version → execute a harmless fixture → record output provenance. Do not infer verified Rosalind compatibility from Codex success alone.
 
-GitHub identities are keyed by stable numeric provider ID, never email or mutable login. `oauth_states` contains ten-minute, browser-bound authorization attempts. GitHub tokens are not persisted. See [OAuth activation](github-sign-in.md); live provider verification remains pending.
+GitHub identities are keyed by stable numeric provider ID, never email or mutable login. `oauth_states` contains ten-minute, browser-bound authorization attempts. GitHub tokens are not persisted. See [OAuth activation](github-sign-in.md). The retired deployment no longer provides a live OAuth endpoint; verify every new origin before describing sign-in as working.
 
 ## Personal AI and acquired-skill handoff
 

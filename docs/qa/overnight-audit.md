@@ -1,3 +1,5 @@
+> Historical QA record from the September 2026 hackathon. It documents past checks and deployments; it is not a current operating procedure. See [current status](../status.md) and [restart guidance](../restart.md).
+
 # BioSkillsHub functional and bounded-load audit
 
 Scope: merged PR #13 plus audit fixes, in Wojtek's checkout and isolated local PostgreSQL schemas/databases. No public-site load, paid AI requests, real GitHub authentication, production writes or scientific computation. This is a reproducible software audit, not a guarantee that every possible input or deployment works.
