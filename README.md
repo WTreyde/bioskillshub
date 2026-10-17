@@ -1,6 +1,6 @@
 # BioSkillsHub
 
-**[Open the static showcase](https://wtreyde.github.io/bioskillshub/)** — a public introduction with an interactive researcher-workspace and marketplace preview, not a live service. Its example listings, local keyword matching, filters and tab-only demo library do not use real catalogue data, make AI requests, accept purchases or download skills. GitHub Pages serves static files only; sign-in, live catalogue data, authoring, acquisition and agent retrieval require the full app and PostgreSQL. See [how to run or restore the working platform](docs/restart.md).
+**[Open the static showcase](https://wtreyde.github.io/bioskillshub/)** — an interactive, local-only mirror of the researcher workspace, not a live service. Explore and My library demonstrate sample listings and simulated acquisition; Creator studio supports local guided drafts, Markdown editing, saving and demo publication. Search/recommendation matching is keyword-only. AI chat/import, authentication, server storage, real publication, payments, skill downloads, API tokens and agent retrieval require the full app and PostgreSQL. Showcase data stays in the current browser tab and is not shared with the project. See [how to run or restore the working platform](docs/restart.md).
 
 The showcase is published from `showcase/` by the GitHub Actions workflow in `.github/workflows/pages.yml`. It contains no live user or catalogue database content. To run the complete application locally or restore it on a new host, follow [docs/restart.md](docs/restart.md).
 
