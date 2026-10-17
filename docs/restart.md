@@ -1,5 +1,9 @@
 # Back up and restart BioSkillsHub
 
+## Static showcase on GitHub Pages
+
+The public [GitHub Pages showcase](https://wtreyde.github.io/bioskillshub/) is a static overview in `showcase/`. It is not the working marketplace: it has no authentication, live catalogue, authoring, purchases, database, or agent API. Changes under `showcase/` deploy from `main` through `.github/workflows/pages.yml`. If Pages has not been enabled for the repository, open **Settings → Pages** and select **GitHub Actions** as the build and deployment source. To bring back the functioning platform, continue with the host and database restore steps below.
+
 The platform needs a CPU host, Docker Compose and PostgreSQL 17. No GPU or scientific execution environment is required. The abandoned experimental case-study package has been removed; the BioNeMo catalogue skills remain ordinary platform content.
 
 The September 2026 website remains on its existing temporary Cloudflare URL until NVIDIA retires the CPU host. Do not stop the tunnel or change live OAuth credentials during closeout. The old temporary URL cannot be relied on after restart. Prefer a stable HTTPS domain for a future public deployment.
